@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
         children: [
           // Transform to move the app name up
           Transform.translate(
-            offset: const Offset(0, -60), // Adjust the second value to move the name up
+            offset: const Offset(0, 30), // Adjust the second value to move the name up
             child: RichText(
               textAlign: TextAlign.center,
               text: const TextSpan(
@@ -26,7 +26,7 @@ class HomePage extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 30), // Space between the title and first block
+          SizedBox(height: 150), // Space between the title and first block
           Container(
   padding: const EdgeInsets.symmetric(horizontal: 20.0),
   child: DecoratedBox(

@@ -366,30 +366,8 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   Widget build(BuildContext context) {
     return CustomScaffold(
-      child: Column(
-        children: [
-          // Transform to move the app name up
-          // Transform.translate(
-            // offset: const Offset(0, -20), // Adjust the second value to move the name up
-            // child: RichText(
-            //   textAlign: TextAlign.center,
-            //   text: const TextSpan(
-            //     text: 'FOOD WASTE MANAGER',
-            //     style: TextStyle(
-            //       fontSize: 40.0,
-            //       fontWeight: FontWeight.bold,
-            //     ),
-            //   ),
-            // ),
-          // ),
-          // SizedBox(height: 80), // Space between the title and first block
-
-          // Conditionally render the page based on the current index
-          Expanded(child: _pages[_currentIndex]),
-
-          // SizedBox(height: 35), // Space between the first and second block
-        ],
-      ),
+      child: _pages[_currentIndex],
+      
       bottomNavigationBar: Container(
         color: Color(0xFFC7E8D5), // Set the background color of the container to green
         child: BottomNavigationBar(
