@@ -12,7 +12,7 @@ class HomePage extends StatelessWidget {
         children: [
           // Transform to move the app name up
           Transform.translate(
-            offset: const Offset(0, 30), // Adjust the second value to move the name up
+            offset: const Offset(0, 40), // Adjust the second value to move the name up
             child: RichText(
               textAlign: TextAlign.center,
               text: const TextSpan(
