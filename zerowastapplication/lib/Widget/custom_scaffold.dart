@@ -17,11 +17,12 @@ class CustomScaffold extends StatelessWidget {
       extendBodyBehindAppBar: true,
       body: Stack(
         children: [
-          Image.asset(
-            'assets/images/menubg2.jpg',
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
+          Positioned.fill(
+            top: -50, // Move the image up by 50 pixels
+            child: Image.asset(
+              'assets/images/menubg2.jpg',
+              fit: BoxFit.cover,
+            ),
           ),
           SafeArea(
             child: child!,
