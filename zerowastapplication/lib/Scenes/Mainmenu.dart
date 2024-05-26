@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:zerowastapplication/Widget/custom_scaffold.dart';
 
 class MenuScreen extends StatefulWidget {
-  const MenuScreen({Key? key}) : super(key: key);
+  const MenuScreen({super.key});
 
   @override
   _MenuScreenState createState() => _MenuScreenState();
@@ -12,14 +12,14 @@ class _MenuScreenState extends State<MenuScreen> {
   int _currentIndex = 0;
 
   // Define a list of widgets to show for each tab
-  final List<Widget> _pages = [
-    // Placeholder widgets for each tab
-    Text('หน้าเเรก', style: TextStyle(fontSize: 24)),
-    Text('เลือกเมนู', style: TextStyle(fontSize: 24)),
-    Text('เพิ่มวัตถุดิบ', style: TextStyle(fontSize: 24)),
-    Text('เพิ่มเมนู', style: TextStyle(fontSize: 24)),
-    Text('คลัง', style: TextStyle(fontSize: 24)),
-  ];
+  // final List<Widget> _pages = [
+  //   // Placeholder widgets for each tab
+  //   const Text('หน้าเเรก', style: TextStyle(fontSize: 24)),
+  //   const Text('เลือกเมนู', style: TextStyle(fontSize: 24)),
+  //   const Text('เพิ่มวัตถุดิบ', style: TextStyle(fontSize: 24)),
+  //   const Text('เพิ่มเมนู', style: TextStyle(fontSize: 24)),
+  //   const Text('คลัง', style: TextStyle(fontSize: 24)),
+  // ];
 
   @override
   Widget build(BuildContext context) {
@@ -28,19 +28,21 @@ class _MenuScreenState extends State<MenuScreen> {
         children: [
           // Transform to move the app name up
           Transform.translate(
-            offset: const Offset(0, -20), // Adjust the second value to move the name up
+            offset: const Offset(0, -25), // Adjust the second value to move the name up
             child: RichText(
               textAlign: TextAlign.center,
               text: const TextSpan(
                 text: 'FOOD WASTE MANAGER',
                 style: TextStyle(
                   fontSize: 40.0,
-                  fontWeight: FontWeight.bold,
+                  fontFamily: "JuliusSansOne",
+                  fontWeight: FontWeight.w900,
+                  color: Colors.black,
                 ),
               ),
             ),
           ),
-          SizedBox(height: 80), // Space between the title and first block
+          SizedBox(height: 60), // Space between the title and first block
 
           // First block of information with shadow and rounded corners
           Container(
@@ -288,38 +290,46 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color(0xFFC7E8D5), // Set the background color
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.black, // Set the selected item color
-        unselectedItemColor: Colors.black54, // Set the unselected item color
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'หน้าเเรก',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book),
-            label: 'เลือกเมนู',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_shopping_cart),
-            label: 'เพิ่มวัตถุดิบ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'เพิ่มเมนู',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory),
-            label: 'คลัง',
-          ),
-        ],
+       bottomNavigationBar: Container(
+        color: Color(0xFFC7E8D5), // Set the background color of the container to green
+        child: BottomNavigationBar(
+          backgroundColor: Colors.transparent, // Set to transparent to show the container's color
+          currentIndex: _currentIndex,
+          selectedItemColor: const Color.fromARGB(255, 0, 0, 0), // Set the selected item color to white
+          unselectedItemColor: Colors.black54, // Set the unselected item color to a darker color
+          onTap: (index) {
+            setState(() {
+              _currentIndex = index;
+            });
+          },
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'หน้าเเรก',
+              backgroundColor: _currentIndex == 0 ? Color(0xFFC7E8D5) : Colors.transparent, // Change color if selected
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.menu_book),
+              label: 'เลือกเมนู',
+              backgroundColor: _currentIndex == 1 ? Color(0xFFC7E8D5) : Colors.transparent, // Change color if selected
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add_shopping_cart),
+              label: 'เพิ่มวัตถุดิบ',
+              backgroundColor: _currentIndex == 2 ? Color(0xFFC7E8D5) : Colors.transparent, // Change color if selected
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.add),
+              label: 'เพิ่มเมนู',
+              backgroundColor: _currentIndex == 3 ? Color(0xFFC7E8D5) : Colors.transparent, // Change color if selected
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.inventory),
+              label: 'คลัง',
+              backgroundColor: _currentIndex == 4 ? Color(0xFFC7E8D5) : Colors.transparent, // Change color if selected
+            ),
+          ],
+        ),
       ),
     );
   }
