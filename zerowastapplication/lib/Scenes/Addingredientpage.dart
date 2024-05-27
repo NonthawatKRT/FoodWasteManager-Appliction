@@ -1,11 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 class AddIngredientsPage extends StatefulWidget {
   @override
-  _AddIngredientPageState createState() => _AddIngredientPageState();
+  _AddIngredientsPageState createState() => _AddIngredientsPageState();
 }
 
-class _AddIngredientPageState extends State<AddIngredientsPage> {
+class _AddIngredientsPageState extends State<AddIngredientsPage> {
   final List<Map<String, dynamic>> _allIngredients = [
     {"id": 1, "name": "beef", "type": "meat", "count": 0, "picture": "assets/images/beef.jpg"},
     {"id": 2, "name": "chicken", "type": "meat", "count": 0, "picture": "assets/images/chicken.jpg"},
@@ -20,14 +23,71 @@ class _AddIngredientPageState extends State<AddIngredientsPage> {
     {"id": 11, "name": "onion", "type": "vegetable", "count": 0, "picture": "assets/images/onion.jpg"},
     {"id": 12, "name": "mushroom", "type": "vegetable", "count": 0, "picture": "assets/images/mushroom.jpg"},
   ];
+
   List<Map<String, dynamic>> _foundIngredients = [];
   String _selectedType = 'all';
   String _searchTerm = '';
+  bool _showFab = false;
+  late File _countFile;
 
   @override
   void initState() {
-    _foundIngredients = _allIngredients;
     super.initState();
+    _foundIngredients = _allIngredients;
+    _initializeFile();
+  }
+
+  Future<void> _initializeFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    _countFile = File('${directory.path}/ingredient_counts.json');
+
+    print('File path: ${_countFile.path}'); // Print the file path for debugging
+
+    if (await _countFile.exists()) {
+      _loadCounts();
+    } else {
+      _saveCounts();
+    }
+  }
+
+  Future<void> _loadCounts() async {
+    final contents = await _countFile.readAsString();
+    final Map<String, dynamic> jsonData = json.decode(contents);
+
+    setState(() {
+      for (var ingredient in _allIngredients) {
+        if (jsonData.containsKey(ingredient['id'].toString())) {
+          ingredient['count'] = jsonData[ingredient['id'].toString()];
+        }
+      }
+    });
+
+    _foundIngredients = _allIngredients;
+    _runFilter(_searchTerm);
+
+    _printFileContents(); // Print file contents after loading
+  }
+
+  Future<void> _saveCounts() async {
+    final Map<String, int> jsonData = {
+      for (var ingredient in _allIngredients) ingredient['id'].toString(): ingredient['count']
+    };
+
+    await _countFile.writeAsString(json.encode(jsonData));
+    setState(() {
+      _showFab = false;
+    });
+
+    _printFileContents(); // Print file contents after saving
+  }
+
+  Future<void> _printFileContents() async {
+    if (await _countFile.exists()) {
+      final contents = await _countFile.readAsString();
+      print('File Contents: $contents');
+    } else {
+      print('File does not exist.');
+    }
   }
 
   void _runFilter(String enteredKeyword) {
@@ -58,6 +118,7 @@ class _AddIngredientPageState extends State<AddIngredientsPage> {
   void _incrementCount(int index) {
     setState(() {
       _foundIngredients[index]['count']++;
+      _showFab = true;
     });
   }
 
@@ -65,8 +126,21 @@ class _AddIngredientPageState extends State<AddIngredientsPage> {
     setState(() {
       if (_foundIngredients[index]['count'] > 0) {
         _foundIngredients[index]['count']--;
+        _showFab = true;
       }
     });
+  }
+
+  void _updateCount(int index, String value) {
+    setState(() {
+      int newCount = int.tryParse(value) ?? 0;
+      _foundIngredients[index]['count'] = newCount;
+      _showFab = true;
+    });
+  }
+
+  void _confirmSelection() {
+    _saveCounts();
   }
 
   @override
@@ -112,10 +186,10 @@ class _AddIngredientPageState extends State<AddIngredientsPage> {
                         ElevatedButton(
                           onPressed: () => _filterByType('all'),
                           child: const Text(
-                            'All',
+                            'ทั้งหมด',
                             style: TextStyle(
                               color: Colors.black87,
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
@@ -125,10 +199,11 @@ class _AddIngredientPageState extends State<AddIngredientsPage> {
                         ElevatedButton(
                           onPressed: () => _filterByType('vegetable'),
                           child: const Text(
-                            'Vegetables',
+                            'ผัก/ผลไม้',
                             style: TextStyle(
                               color: Colors.black87,
-                              fontSize: 16,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
@@ -138,10 +213,10 @@ class _AddIngredientPageState extends State<AddIngredientsPage> {
                         ElevatedButton(
                           onPressed: () => _filterByType('meat'),
                           child: const Text(
-                            'Meat',
+                            'เนื้อสัตว์',
                             style: TextStyle(
                               color: Colors.black87,
-                              fontSize: 16,
+                              fontSize: 14,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
@@ -192,9 +267,20 @@ class _AddIngredientPageState extends State<AddIngredientsPage> {
                                                       icon: const Icon(Icons.remove),
                                                       onPressed: () => _decrementCount(index),
                                                     ),
-                                                    Text(
-                                                      '${_foundIngredients[index]["count"].toString()}',
-                                                      style: const TextStyle(fontSize: 16),
+                                                    Container(
+                                                      width: 50,
+                                                      height: 30, // Set the height of the TextField
+                                                      child: TextField(
+                                                        keyboardType: TextInputType.number,
+                                                        controller: TextEditingController(text: _foundIngredients[index]["count"].toString()),
+                                                        onSubmitted: (value) => _updateCount(index, value),
+                                                        textAlign: TextAlign.center,
+                                                        textAlignVertical: TextAlignVertical.center,
+                                                        decoration: const InputDecoration(
+                                                          border: OutlineInputBorder(),
+                                                          contentPadding: EdgeInsets.all(3), // Adjust the padding
+                                                        ),
+                                                      ),
                                                     ),
                                                     IconButton(
                                                       icon: const Icon(Icons.add),
@@ -226,6 +312,14 @@ class _AddIngredientPageState extends State<AddIngredientsPage> {
           ],
         ),
       ),
+      floatingActionButton: _showFab
+          ? FloatingActionButton.extended(
+              onPressed: _confirmSelection,
+              label: const Text('Confirm'),
+              icon: const Icon(Icons.check),
+              backgroundColor: const Color(0xFFC7E8D5),
+            )
+          : null,
     );
   }
 }
