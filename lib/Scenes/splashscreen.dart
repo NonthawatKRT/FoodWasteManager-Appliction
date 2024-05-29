@@ -17,7 +17,7 @@ class SplashScreen extends StatelessWidget {
           ),
         ],
       ),
-      nextScreen: const MenuScreen(),
+      nextScreen: const MainPageContainer(),
       splashIconSize: 400,
       backgroundColor: Color(0xFFC7E8D5),
       duration: 4700, // Set this to the duration of your Lottie animation in milliseconds

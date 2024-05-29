@@ -7,14 +7,14 @@ import 'package:zerowastapplication/Scenes/Inventorypage.dart';
 import 'package:zerowastapplication/Scenes/Menupage.dart';
 import 'package:zerowastapplication/Widget/custom_scaffold.dart';
 
-class MenuScreen extends StatefulWidget {
-  const MenuScreen({Key? key}) : super(key: key);
+class MainPageContainer extends StatefulWidget {
+  const MainPageContainer({Key? key}) : super(key: key);
 
   @override
-  _MenuScreenState createState() => _MenuScreenState();
+  _MainPageContainerState createState() => _MainPageContainerState();
 }
 
-class _MenuScreenState extends State<MenuScreen> {
+class _MainPageContainerState extends State<MainPageContainer> {
   int _currentIndex = 0;
   bool _isLoading = false;
 
@@ -105,96 +105,93 @@ class _MenuScreenState extends State<MenuScreen> {
           ),
         );
       case 1:
-  return Container(
-    color: Colors.grey[200], // Grey background
-    padding: const EdgeInsets.only(top: 0), // Add padding to start below the app bar
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Shimmer.fromColors(
-          baseColor: Colors.grey[300]!,
-          highlightColor: Colors.grey[100]!,
-          child: Container(
-            height: 56.0, // Height of the app bar
-            color: Colors.grey[300],
-            child: Center(child: Text('Loading App Bar...')),
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Shimmer.fromColors(
-            baseColor: Colors.grey[300]!,
-            highlightColor: Colors.grey[100]!,
-            child: Container(
-              height: 50, // 50% height of a typical box (more space)
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(10),
+        return Container(
+          color: Colors.grey[200], // Grey background
+          padding: const EdgeInsets.only(top: 0), // Add padding to start below the app bar
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Shimmer.fromColors(
+                baseColor: Colors.grey[300]!,
+                highlightColor: Colors.grey[100]!,
+                child: Container(
+                  height: 56.0, // Height of the app bar
+                  color: Colors.grey[300],
+                  child: Center(child: Text('Loading App Bar...')),
+                ),
               ),
-            ),
-          ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: 6, // Number of shimmer items
-            itemBuilder: (context, index) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 35.0, vertical: 8.0),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
                   child: Container(
-                    padding: const EdgeInsets.all(16.0),
+                    height: 50, // 50% height of a typical box (more space)
                     decoration: BoxDecoration(
                       color: Colors.grey[300],
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          color: Colors.grey[300],
-                        ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 6, // Number of shimmer items
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 35.0, vertical: 8.0),
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
                             children: [
                               Container(
-                                width: double.infinity,
-                                height: 25,
+                                width: 50,
+                                height: 50,
                                 color: Colors.grey[300],
                               ),
-                              const SizedBox(height: 15),
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: double.infinity,
+                                      height: 25,
+                                      color: Colors.grey[300],
+                                    ),
+                                    const SizedBox(height: 15),
+                                    Container(
+                                      width: 100,
+                                      height: 16,
+                                      color: Colors.grey[300],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16),
                               Container(
-                                width: 100,
-                                height: 16,
+                                width: 50, // Adjust width according to your design
+                                height: 50, // Adjust height according to your design
                                 color: Colors.grey[300],
                               ),
                             ],
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Container(
-                          width: 50, // Adjust width according to your design
-                          height: 50, // Adjust height according to your design
-                          color: Colors.grey[300],
-                        ),
-                      ],
-                    ),
-                  ),
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+            ],
           ),
-        ),
-      ],
-    ),
-  );
-
-
-
+        );
       case 2:
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 0),
@@ -213,8 +210,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               SizedBox(height: 8),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -230,8 +226,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 4), // Apply padding
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4), // Apply padding
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
@@ -241,9 +236,7 @@ class _MenuScreenState extends State<MenuScreen> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical:
-                                  30), // Apply vertical padding to the row
+                          padding: const EdgeInsets.symmetric(vertical: 30), // Apply vertical padding to the row
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -291,9 +284,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           child: ListView.builder(
                             itemCount: 6,
                             itemBuilder: (context, index) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                  horizontal: 16), // Apply vertical padding
+                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16), // Apply vertical padding
                               child: Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
@@ -317,7 +308,6 @@ class _MenuScreenState extends State<MenuScreen> {
             ],
           ),
         );
-
       case 3:
         return Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
@@ -345,8 +335,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               SizedBox(height: 8),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -362,8 +351,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 4), // Apply padding
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4), // Apply padding
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
@@ -376,9 +364,7 @@ class _MenuScreenState extends State<MenuScreen> {
                           child: ListView.builder(
                             itemCount: 6,
                             itemBuilder: (context, index) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0,
-                                  horizontal: 16), // Apply vertical padding
+                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16), // Apply vertical padding
                               child: Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
@@ -402,7 +388,6 @@ class _MenuScreenState extends State<MenuScreen> {
             ],
           ),
         );
-
       default:
         return Shimmer.fromColors(
           baseColor: Colors.grey[300]!,
