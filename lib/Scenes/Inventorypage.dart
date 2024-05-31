@@ -10,30 +10,35 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final List<Map<String, dynamic>> _allIngredients = [
-    {"id": 1, "name": "beef", "type": "meat", "count": 0, "unit": "kg", "picture": "assets/images/beef.jpg"},
-    {"id": 2, "name": "chicken", "type": "meat", "count": 0, "unit": "kg", "picture": "assets/images/chicken.jpg"},
-    {"id": 3, "name": "fish", "type": "meat", "count": 0, "unit": "kg", "picture": "assets/images/fish.jpg"},
-    {"id": 4, "name": "pork", "type": "meat", "count": 0, "unit": "kg", "picture": "assets/images/pork.jpg"},
-    {"id": 5, "name": "shrimp", "type": "meat", "count": 0, "unit": "kg", "picture": "assets/images/shrimp.jpg"},
-    {"id": 6, "name": "crab", "type": "meat", "count": 0, "unit": "kg", "picture": "assets/images/crab.jpg"},
-    {"id": 7, "name": "cabbage", "type": "vegetable", "count": 0, "unit": "kg", "picture": "assets/images/cabbage.jpg"},
-    {"id": 8, "name": "carrot", "type": "vegetable", "count": 0, "unit": "kg", "picture": "assets/images/carrot.jpg"},
-    {"id": 9, "name": "tomato", "type": "vegetable", "count": 0, "unit": "kg", "picture": "assets/images/tomato.jpg"},
-    {"id": 10, "name": "lime", "type": "vegetable", "count": 0, "unit": "kg", "picture": "assets/images/lime.jpg"},
-    {"id": 11, "name": "onion", "type": "vegetable", "count": 0, "unit": "kg", "picture": "assets/images/onion.jpg"},
-    {"id": 12, "name": "mushroom", "type": "vegetable", "count": 0, "unit": "kg", "picture": "assets/images/mushroom.jpg"},
+    {"id": 1, "name": "beef", "type": "meat", "unit": "kg", "picture": "assets/images/beef.jpg"},
+    {"id": 2, "name": "chicken", "type": "meat", "unit": "kg", "picture": "assets/images/chicken.jpg"},
+    {"id": 3, "name": "fish", "type": "meat", "unit": "kg", "picture": "assets/images/fish.jpg"},
+    {"id": 4, "name": "pork", "type": "meat", "unit": "kg", "picture": "assets/images/pork.jpg"},
+    {"id": 5, "name": "shrimp", "type": "meat", "unit": "kg", "picture": "assets/images/shrimp.jpg"},
+    {"id": 6, "name": "crab", "type": "meat", "unit": "kg", "picture": "assets/images/crab.jpg"},
+    {"id": 7, "name": "cabbage", "type": "vegetable", "unit": "kg", "picture": "assets/images/cabbage.jpg"},
+    {"id": 8, "name": "carrot", "type": "vegetable", "unit": "kg", "picture": "assets/images/carrot.jpg"},
+    {"id": 9, "name": "tomato", "type": "vegetable", "unit": "kg", "picture": "assets/images/tomato.jpg"},
+    {"id": 10, "name": "lime", "type": "vegetable", "unit": "kg", "picture": "assets/images/lime.jpg"},
+    {"id": 11, "name": "onion", "type": "vegetable", "unit": "kg", "picture": "assets/images/onion.jpg"},
+    {"id": 12, "name": "mushroom", "type": "vegetable", "unit": "kg", "picture": "assets/images/mushroom.jpg"},
   ];
 
   List<Map<String, dynamic>> _foundIngredients = [];
   String _searchTerm = '';
   bool _isEditing = false;
   late File _countFile;
+  Map<String, Map<String, int>> _ingredientCounts = {};
+  Map<String, bool> _showDetails = {}; // Add a map to track which ingredients have details shown
 
   @override
   void initState() {
     super.initState();
     _foundIngredients = _allIngredients;
     _initializeFile();
+    for (var ingredient in _allIngredients) {
+      _showDetails[ingredient['id'].toString()] = false; // Initialize all details to be hidden
+    }
   }
 
   Future<void> _initializeFile() async {
@@ -54,25 +59,20 @@ class _InventoryPageState extends State<InventoryPage> {
     final Map<String, dynamic> jsonData = json.decode(contents);
 
     setState(() {
-      for (var ingredient in _allIngredients) {
-        if (jsonData.containsKey(ingredient['id'].toString())) {
-          ingredient['count'] = jsonData[ingredient['id'].toString()];
-        }
-      }
+      _ingredientCounts = jsonData.map((key, value) => MapEntry(key, (value as Map).map((k, v) => MapEntry(k, v as int))));
+      _updateTotalCounts();
     });
-
-    _foundIngredients = _allIngredients;
-    _runFilter(_searchTerm);
 
     _printFileContents(); // Print file contents after loading
   }
 
   Future<void> _saveCounts() async {
-    final Map<String, int> jsonData = {
-      for (var ingredient in _allIngredients) ingredient['id'].toString(): ingredient['count']
-    };
-
+    final jsonData = _ingredientCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
     await _countFile.writeAsString(json.encode(jsonData));
+
+    _updateTotalCounts();
+
+    _printFileContents(); // Print file contents after saving
   }
 
   Future<void> _printFileContents() async {
@@ -100,25 +100,38 @@ class _InventoryPageState extends State<InventoryPage> {
     });
   }
 
-  void _incrementCount(int index) {
+  void _incrementCount(int index, String date) {
     setState(() {
-      _foundIngredients[index]['count']++;
+      _ingredientCounts[_foundIngredients[index]['id'].toString()]![date] =
+          (_ingredientCounts[_foundIngredients[index]['id'].toString()]![date]! + 1);
     });
   }
 
-  void _decrementCount(int index) {
+  void _decrementCount(int index, String date) {
     setState(() {
-      if (_foundIngredients[index]['count'] > 0) {
-        _foundIngredients[index]['count']--;
+      if (_ingredientCounts[_foundIngredients[index]['id'].toString()]![date]! > 0) {
+        _ingredientCounts[_foundIngredients[index]['id'].toString()]![date] =
+            (_ingredientCounts[_foundIngredients[index]['id'].toString()]![date]! - 1);
       }
     });
   }
 
-  void _updateCount(int index, String value) {
+  void _updateCount(int index, String date, String value) {
     setState(() {
       int newCount = int.tryParse(value) ?? 0;
-      _foundIngredients[index]['count'] = newCount;
+      _ingredientCounts[_foundIngredients[index]['id'].toString()]![date] = newCount;
     });
+  }
+
+  void _updateTotalCounts() {
+    for (var ingredient in _allIngredients) {
+      final id = ingredient['id'].toString();
+      if (_ingredientCounts.containsKey(id)) {
+        ingredient['count'] = _ingredientCounts[id]!.values.reduce((a, b) => a + b);
+      } else {
+        ingredient['count'] = 0;
+      }
+    }
   }
 
   void _toggleEditMode() {
@@ -127,6 +140,13 @@ class _InventoryPageState extends State<InventoryPage> {
       if (!_isEditing) {
         _saveCounts();
       }
+    });
+  }
+
+  void _toggleDetails(int index) {
+    setState(() {
+      final id = _foundIngredients[index]['id'].toString();
+      _showDetails[id] = !_showDetails[id]!;
     });
   }
 
@@ -140,9 +160,11 @@ class _InventoryPageState extends State<InventoryPage> {
         title: const Text('Inventory'),
         actions: [
           TextButton.icon(
-            icon: Icon(_isEditing ? Icons.check : Icons.edit,color: Color.fromARGB(255, 63, 63, 63),),
-            label: Text(_isEditing ? 'Confirm' : 'Edit',
-            style: TextStyle(color: Color.fromARGB(255, 63, 63, 63)),),
+            icon: Icon(_isEditing ? Icons.check : Icons.edit, color: Color.fromARGB(255, 63, 63, 63)),
+            label: Text(
+              _isEditing ? 'Confirm' : 'Edit',
+              style: TextStyle(color: Color.fromARGB(255, 63, 63, 63)),
+            ),
             style: TextButton.styleFrom(backgroundColor: Colors.transparent),
             onPressed: _toggleEditMode,
           ),
@@ -208,58 +230,101 @@ class _InventoryPageState extends State<InventoryPage> {
                                             ),
                                           ),
                                           const SizedBox(height: 8),
-                                          _isEditing
-                                              ? Row(
-                                                  children: [
-                                                    IconButton(
-                                                      icon: const Icon(Icons.remove),
-                                                      onPressed: () => _decrementCount(index),
-                                                    ),
-                                                    Container(
-                                                      width: 50,
-                                                      height: 30,
-                                                      child: TextField(
-                                                        keyboardType: TextInputType.number,
-                                                        controller: TextEditingController(
-                                                            text: _foundIngredients[index]["count"].toString()),
-                                                        onSubmitted: (value) => _updateCount(index, value),
-                                                        textAlign: TextAlign.center,
-                                                        textAlignVertical: TextAlignVertical.center,
-                                                        enabled: _isEditing,
-                                                        decoration: const InputDecoration(
-                                                          border: OutlineInputBorder(),
-                                                          contentPadding: EdgeInsets.all(3),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    IconButton(
-                                                      icon: const Icon(Icons.add),
-                                                      onPressed: () => _incrementCount(index),
-                                                    ),
-                                                  ],
-                                                )
-                                              : Padding(
-                                                  padding: const EdgeInsets.only(left: 16.0),
-                                                  child: Text(
-                                                    '${_foundIngredients[index]['count']} ${_foundIngredients[index]['unit']}',
-                                                    style: const TextStyle(fontSize: 18),
-                                                  ),
-                                                ),
+                                          if (!_isEditing)
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 16.0),
+                                              child: Text(
+                                                'Count: ${_foundIngredients[index]['count']}',
+                                                style: const TextStyle(fontSize: 16),
+                                              ),
+                                            ),
                                         ],
                                       ),
                                     ),
                                   ],
+                                ),
+                                if (_isEditing)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50.0),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: _ingredientCounts[_foundIngredients[index]['id'].toString()]!
+                                            .entries
+                                            .map(
+                                              (entry) => Row(
+                                                children: [
+                                                  Text(
+                                                    entry.key,
+                                                    style: TextStyle(
+                                                      fontSize: 15, // Change this value to adjust the font size
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    icon: const Icon(Icons.remove),
+                                                    onPressed: () => _decrementCount(index, entry.key),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 40,
+                                                    height: 30,
+                                                    child: TextField(
+                                                      controller: TextEditingController(text: entry.value.toString()),
+                                                      keyboardType: TextInputType.number,
+                                                      textAlign: TextAlign.center,
+                                                      onChanged: (value) => _updateCount(index, entry.key, value),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    icon: const Icon(Icons.add),
+                                                    onPressed: () => _incrementCount(index, entry.key),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                            .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                if (_showDetails[_foundIngredients[index]['id'].toString()]!)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50.0),
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        children: _ingredientCounts[_foundIngredients[index]['id'].toString()]!
+                                            .entries
+                                            .map(
+                                              (entry) => Row(
+                                                children: [
+                                                  Text(
+                                                    entry.key,
+                                                    style: TextStyle(fontSize: 15),
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Text(
+                                                    entry.value.toString(),
+                                                    style: TextStyle(fontSize: 15),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                            .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                Align(
+                                  alignment: Alignment.bottomLeft,
+                                  child: TextButton(
+                                    onPressed: () => _toggleDetails(index),
+                                    child: Text(_showDetails[_foundIngredients[index]['id'].toString()]! ? 'Hide' : 'Details'),
+                                  ),
                                 ),
                               ],
                             ),
                           ),
                         ),
                       )
-                    : const Center(
-                        child: Text(
-                          'No results found',
-                          style: TextStyle(fontSize: 24),
-                        ),
+                    : const Text(
+                        'No results found',
+                        style: TextStyle(fontSize: 24),
                       ),
               ),
             ),
