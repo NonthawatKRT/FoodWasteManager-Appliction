@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class InventoryPage extends StatefulWidget {
   @override
@@ -10,18 +12,90 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final List<Map<String, dynamic>> _allIngredients = [
-    {"id": 1, "name": "beef", "type": "meat", "unit": "kg", "picture": "assets/images/beef.jpg"},
-    {"id": 2, "name": "chicken", "type": "meat", "unit": "kg", "picture": "assets/images/chicken.jpg"},
-    {"id": 3, "name": "fish", "type": "meat", "unit": "kg", "picture": "assets/images/fish.jpg"},
-    {"id": 4, "name": "pork", "type": "meat", "unit": "kg", "picture": "assets/images/pork.jpg"},
-    {"id": 5, "name": "shrimp", "type": "meat", "unit": "kg", "picture": "assets/images/shrimp.jpg"},
-    {"id": 6, "name": "crab", "type": "meat", "unit": "kg", "picture": "assets/images/crab.jpg"},
-    {"id": 7, "name": "cabbage", "type": "vegetable", "unit": "kg", "picture": "assets/images/cabbage.jpg"},
-    {"id": 8, "name": "carrot", "type": "vegetable", "unit": "kg", "picture": "assets/images/carrot.jpg"},
-    {"id": 9, "name": "tomato", "type": "vegetable", "unit": "kg", "picture": "assets/images/tomato.jpg"},
-    {"id": 10, "name": "lime", "type": "vegetable", "unit": "kg", "picture": "assets/images/lime.jpg"},
-    {"id": 11, "name": "onion", "type": "vegetable", "unit": "kg", "picture": "assets/images/onion.jpg"},
-    {"id": 12, "name": "mushroom", "type": "vegetable", "unit": "kg", "picture": "assets/images/mushroom.jpg"},
+    {
+      "id": 1,
+      "name": "beef",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/beef.jpg"
+    },
+    {
+      "id": 2,
+      "name": "chicken",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/chicken.jpg"
+    },
+    {
+      "id": 3,
+      "name": "fish",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/fish.jpg"
+    },
+    {
+      "id": 4,
+      "name": "pork",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/pork.jpg"
+    },
+    {
+      "id": 5,
+      "name": "shrimp",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/shrimp.jpg"
+    },
+    {
+      "id": 6,
+      "name": "crab",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/crab.jpg"
+    },
+    {
+      "id": 7,
+      "name": "cabbage",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/cabbage.jpg"
+    },
+    {
+      "id": 8,
+      "name": "carrot",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/carrot.jpg"
+    },
+    {
+      "id": 9,
+      "name": "tomato",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/tomato.jpg"
+    },
+    {
+      "id": 10,
+      "name": "lime",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/lime.jpg"
+    },
+    {
+      "id": 11,
+      "name": "onion",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/onion.jpg"
+    },
+    {
+      "id": 12,
+      "name": "mushroom",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/mushroom.jpg"
+    },
   ];
 
   List<Map<String, dynamic>> _foundIngredients = [];
@@ -29,15 +103,20 @@ class _InventoryPageState extends State<InventoryPage> {
   bool _isEditing = false;
   late File _countFile;
   Map<String, Map<String, int>> _ingredientCounts = {};
-  Map<String, bool> _showDetails = {}; // Add a map to track which ingredients have details shown
+  Map<String, bool> _showDetails = {};
 
   @override
   void initState() {
     super.initState();
     _foundIngredients = _allIngredients;
     _initializeFile();
+    for (var entry in _ingredientCounts.entries) {
+      // Create a new controller for each ingredient and initialize its text
+      _controllers[entry.key] =
+          TextEditingController(text: entry.value.toString());
+    }
     for (var ingredient in _allIngredients) {
-      _showDetails[ingredient['id'].toString()] = false; // Initialize all details to be hidden
+      _showDetails[ingredient['id'].toString()] = false;
     }
   }
 
@@ -56,18 +135,25 @@ class _InventoryPageState extends State<InventoryPage> {
 
   Future<void> _loadCounts() async {
     final contents = await _countFile.readAsString();
-    final Map<String, dynamic> jsonData = json.decode(contents);
+  final Map<String, dynamic> jsonData = json.decode(contents);
 
-    setState(() {
-      _ingredientCounts = jsonData.map((key, value) => MapEntry(key, (value as Map).map((k, v) => MapEntry(k, v as int))));
-      _updateTotalCounts();
-    });
+  setState(() {
+    _ingredientCounts = jsonData.map((key, value) =>
+        MapEntry(key, (value as Map).map((k, v) => MapEntry(k, v as int))));
+    _updateTotalCounts();
+    // Initialize text controllers with current count values
+    for (var entry in _ingredientCounts.entries) {
+      _controllers[entry.key] =
+          TextEditingController(text: entry.value.toString());
+    }
+  });
 
-    _printFileContents(); // Print file contents after loading
+  _printFileContents(); // Print file contents after loading
   }
 
   Future<void> _saveCounts() async {
-    final jsonData = _ingredientCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
+    final jsonData = _ingredientCounts.map(
+        (key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
     await _countFile.writeAsString(json.encode(jsonData));
 
     _updateTotalCounts();
@@ -91,7 +177,9 @@ class _InventoryPageState extends State<InventoryPage> {
       results = _allIngredients;
     } else {
       results = _allIngredients
-          .where((ingredient) => ingredient["name"].toLowerCase().contains(enteredKeyword.toLowerCase()))
+          .where((ingredient) => ingredient["name"]
+              .toLowerCase()
+              .contains(enteredKeyword.toLowerCase()))
           .toList();
     }
 
@@ -103,15 +191,20 @@ class _InventoryPageState extends State<InventoryPage> {
   void _incrementCount(int index, String date) {
     setState(() {
       _ingredientCounts[_foundIngredients[index]['id'].toString()]![date] =
-          (_ingredientCounts[_foundIngredients[index]['id'].toString()]![date]! + 1);
+          (_ingredientCounts[_foundIngredients[index]['id'].toString()]![
+                  date]! +
+              1);
     });
   }
 
   void _decrementCount(int index, String date) {
     setState(() {
-      if (_ingredientCounts[_foundIngredients[index]['id'].toString()]![date]! > 0) {
+      if (_ingredientCounts[_foundIngredients[index]['id'].toString()]![date]! >
+          0) {
         _ingredientCounts[_foundIngredients[index]['id'].toString()]![date] =
-            (_ingredientCounts[_foundIngredients[index]['id'].toString()]![date]! - 1);
+            (_ingredientCounts[_foundIngredients[index]['id'].toString()]![
+                    date]! -
+                1);
       }
     });
   }
@@ -119,7 +212,8 @@ class _InventoryPageState extends State<InventoryPage> {
   void _updateCount(int index, String date, String value) {
     setState(() {
       int newCount = int.tryParse(value) ?? 0;
-      _ingredientCounts[_foundIngredients[index]['id'].toString()]![date] = newCount;
+      _ingredientCounts[_foundIngredients[index]['id'].toString()]![date] =
+          newCount;
     });
   }
 
@@ -127,7 +221,8 @@ class _InventoryPageState extends State<InventoryPage> {
     for (var ingredient in _allIngredients) {
       final id = ingredient['id'].toString();
       if (_ingredientCounts.containsKey(id)) {
-        ingredient['count'] = _ingredientCounts[id]!.values.reduce((a, b) => a + b);
+        ingredient['count'] =
+            _ingredientCounts[id]!.values.reduce((a, b) => a + b);
       } else {
         ingredient['count'] = 0;
       }
@@ -136,11 +231,32 @@ class _InventoryPageState extends State<InventoryPage> {
 
   void _toggleEditMode() {
     setState(() {
-      _isEditing = !_isEditing;
-      if (!_isEditing) {
-        _saveCounts();
+    _isEditing = !_isEditing;
+    if (!_isEditing) {
+      // Show loading alert
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.loading,
+        title: 'Loading',
+        text: 'Saving ingredient counts...',
+      );
+
+      // Delay for 1 second and then close the alert
+      Future.delayed(Duration(seconds: 2), () {
+        setState(() {
+          // Save ingredient counts
+          _saveCounts();
+          // Hide loading alert
+          Navigator.pop(context);
+        });
+      });
+    } else {
+      // Update controllers with current count values when entering edit mode
+      for (var entry in _ingredientCounts.entries) {
+        _controllers[entry.key]?.text = entry.value.toString();
       }
-    });
+    }
+  });
   }
 
   void _toggleDetails(int index) {
@@ -149,6 +265,9 @@ class _InventoryPageState extends State<InventoryPage> {
       _showDetails[id] = !_showDetails[id]!;
     });
   }
+
+  final TextEditingController _controller = TextEditingController();
+  Map<String, TextEditingController> _controllers = {};
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +279,8 @@ class _InventoryPageState extends State<InventoryPage> {
         title: const Text('Inventory'),
         actions: [
           TextButton.icon(
-            icon: Icon(_isEditing ? Icons.check : Icons.edit, color: Color.fromARGB(255, 63, 63, 63)),
+            icon: Icon(_isEditing ? Icons.check : Icons.edit,
+                color: Color.fromARGB(255, 63, 63, 63)),
             label: Text(
               _isEditing ? 'Confirm' : 'Edit',
               style: TextStyle(color: Color.fromARGB(255, 63, 63, 63)),
@@ -184,7 +304,8 @@ class _InventoryPageState extends State<InventoryPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
                   ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 ),
               ),
             ),
@@ -205,7 +326,8 @@ class _InventoryPageState extends State<InventoryPage> {
                           elevation: 0,
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 13, horizontal: 13),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -220,35 +342,54 @@ class _InventoryPageState extends State<InventoryPage> {
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(left: 16.0),
+                                            padding: const EdgeInsets.only(
+                                                left: 16.0),
                                             child: Text(
                                               _foundIngredients[index]['name'],
-                                              style: const TextStyle(fontSize: 18),
+                                              style:
+                                                  const TextStyle(fontSize: 18),
                                             ),
                                           ),
                                           const SizedBox(height: 8),
                                           if (!_isEditing)
                                             Padding(
-                                              padding: const EdgeInsets.only(left: 16.0),
+                                              padding: const EdgeInsets.only(
+                                                  left: 16.0),
                                               child: Text(
                                                 'Count: ${_foundIngredients[index]['count']}',
-                                                style: const TextStyle(fontSize: 16),
+                                                style: const TextStyle(
+                                                    fontSize: 16),
                                               ),
                                             ),
                                         ],
                                       ),
                                     ),
+                                    if (!_isEditing)
+                                      TextButton(
+                                        onPressed: () => _toggleDetails(index),
+                                        child: Text(_showDetails[
+                                                _foundIngredients[index]['id']
+                                                    .toString()]!
+                                            ? 'Hide'
+                                            : 'Show Detail'),
+                                      ),
                                   ],
                                 ),
-                                if (_isEditing)
+                                if (_showDetails[_foundIngredients[index]['id']
+                                        .toString()]! &&
+                                    !_isEditing)
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 50.0),
+                                    padding: const EdgeInsets.only(
+                                        left: 50.0, top: 8),
                                     child: SingleChildScrollView(
                                       child: Column(
-                                        children: _ingredientCounts[_foundIngredients[index]['id'].toString()]!
+                                        children: _ingredientCounts[
+                                                _foundIngredients[index]['id']
+                                                    .toString()]!
                                             .entries
                                             .map(
                                               (entry) => Row(
@@ -256,26 +397,15 @@ class _InventoryPageState extends State<InventoryPage> {
                                                   Text(
                                                     entry.key,
                                                     style: TextStyle(
-                                                      fontSize: 15, // Change this value to adjust the font size
+                                                      fontSize: 15,
                                                     ),
                                                   ),
-                                                  IconButton(
-                                                    icon: const Icon(Icons.remove),
-                                                    onPressed: () => _decrementCount(index, entry.key),
-                                                  ),
-                                                  SizedBox(
-                                                    width: 40,
-                                                    height: 30,
-                                                    child: TextField(
-                                                      controller: TextEditingController(text: entry.value.toString()),
-                                                      keyboardType: TextInputType.number,
-                                                      textAlign: TextAlign.center,
-                                                      onChanged: (value) => _updateCount(index, entry.key, value),
+                                                  SizedBox(width: 10),
+                                                  Text(
+                                                    entry.value.toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 15,
                                                     ),
-                                                  ),
-                                                  IconButton(
-                                                    icon: const Icon(Icons.add),
-                                                    onPressed: () => _incrementCount(index, entry.key),
                                                   ),
                                                 ],
                                               ),
@@ -284,24 +414,55 @@ class _InventoryPageState extends State<InventoryPage> {
                                       ),
                                     ),
                                   ),
-                                if (_showDetails[_foundIngredients[index]['id'].toString()]!)
+                                if (_isEditing)
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 50.0),
+                                    padding: const EdgeInsets.only(
+                                        left: 50.0, top: 8),
                                     child: SingleChildScrollView(
                                       child: Column(
-                                        children: _ingredientCounts[_foundIngredients[index]['id'].toString()]!
+                                        children: _ingredientCounts[
+                                                _foundIngredients[index]['id']
+                                                    .toString()]!
                                             .entries
                                             .map(
                                               (entry) => Row(
                                                 children: [
                                                   Text(
                                                     entry.key,
-                                                    style: TextStyle(fontSize: 15),
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                    ),
                                                   ),
-                                                  const SizedBox(width: 10),
-                                                  Text(
-                                                    entry.value.toString(),
-                                                    style: TextStyle(fontSize: 15),
+                                                  SizedBox(width: 10),
+                                                  IconButton(
+                                                    icon: Icon(Icons.remove),
+                                                    onPressed: () =>
+                                                        _decrementCount(
+                                                            index, entry.key),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 40,
+                                                    height: 30,
+                                                    child: TextField(
+                                                      controller: _controllers[
+                                                          index], // Use the controller for the current ingredient
+                                                      keyboardType:
+                                                          TextInputType.number,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      onChanged: (value) =>
+                                                          _updateCount(
+                                                        index,
+                                                        entry.key,
+                                                        value,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(Icons.add),
+                                                    onPressed: () =>
+                                                        _incrementCount(
+                                                            index, entry.key),
                                                   ),
                                                 ],
                                               ),
@@ -310,13 +471,6 @@ class _InventoryPageState extends State<InventoryPage> {
                                       ),
                                     ),
                                   ),
-                                Align(
-                                  alignment: Alignment.bottomLeft,
-                                  child: TextButton(
-                                    onPressed: () => _toggleDetails(index),
-                                    child: Text(_showDetails[_foundIngredients[index]['id'].toString()]! ? 'Hide' : 'Details'),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
