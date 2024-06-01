@@ -32,28 +32,28 @@ class _MenuScreenState extends State<MenuScreen> {
       "name": "กระเพราหมูสับ",
       "count": 0,
       "picture": "assets/images/kapraw.jpg",
-      "ingredients": {"4": 0.2}
+      "ingredients": {"4": 0.4, "8": 0.1}
     },
     {
       "id": 2,
       "name": "ต้มยำกุ้ง",
       "count": 0,
       "picture": "assets/images/tomyumkung.jpg",
-      "ingredients": {"5": 0.3, "10": 0.1, "12": 0.1}
+      "ingredients": {"5": 0.6, "10": 0.03, "12": 0.1}
     },
     {
       "id": 3,
       "name": "ข้าวผัดกุ้ง",
       "count": 0,
       "picture": "assets/images/kawpadkung.jpg",
-      "ingredients": {"5": 1}
+      "ingredients": {"5": 0.4, "8": 0.05, "10": 0.02}
     },
     {
       "id": 4,
       "name": "ข้าวมันไก่",
       "count": 0,
       "picture": "assets/images/kawmankai.jpg",
-      "ingredients": {"2": 2}
+      "ingredients": {"2": 0.4, "10": 0.02}
     },
     {
       "id": 5,
@@ -112,13 +112,17 @@ Future<void> _printFileContents() async {
 
 
   Future<void> _saveCounts() async {
-    final jsonData = _ingredientCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
-    await _countFile.writeAsString(json.encode(jsonData));
-    setState(() {
-    });
+  // Round the counts to two decimal places
+  final roundedCounts = _ingredientCounts.map((key, value) {
+    final roundedValues = value.map((k, v) => MapEntry(k, v.toStringAsFixed(2)));
+    return MapEntry(key, roundedValues);
+  });
 
-    _printFileContents(); // Print file contents after saving
-  }
+  final jsonData = roundedCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, double.parse(v)))));
+  await _countFile.writeAsString(json.encode(jsonData));
+
+  _printFileContents(); // Print file contents after saving
+}
 
 
   void _runFilter(String enteredKeyword) {
@@ -145,12 +149,22 @@ Future<void> _printFileContents() async {
 
     print('Checking ingredient: $ingredientId');
     print('Required: $requiredQuantity');
-    print('Available on $currentDate: ${_ingredientCounts[ingredientId]?[currentDate]}');
+    print('Available on $currentDate: ${(_ingredientCounts[ingredientId]?[currentDate] ?? 0).toStringAsFixed(2)}');
+
 
     if (!_ingredientCounts.containsKey(ingredientId) ||
         !_ingredientCounts[ingredientId]!.containsKey(currentDate) ||
         (_ingredientCounts[ingredientId]![currentDate] ?? 0) < requiredQuantity) {
-      return false;
+      print('Out of ingredients');
+        // Display warning message if there are not enough ingredients
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.warning,
+          title: 'Warning',
+          text: 'Not enough ingredients!',
+          confirmBtnColor: Colors.grey[500]!,
+        );
+        return false;
     }
   }
   return true;
@@ -160,24 +174,40 @@ Future<void> _printFileContents() async {
   if (_hasEnoughIngredients(_foundMenu[index], index)) {
     setState(() {
       final String currentDate = DateTime.now().toIso8601String().split('T').first;
-      final ingredientId = _foundMenu[index]['ingredients'].keys.first;
-      final requiredQuantity = _foundMenu[index]['ingredients'][ingredientId];
+      final ingredients = _foundMenu[index]['ingredients'];
 
-      // Check if ingredientId and currentDate are not null and if the requiredQuantity is less than or equal to the current count
-      if (ingredientId != null && currentDate != null && requiredQuantity != null && _ingredientCounts[ingredientId] != null && _ingredientCounts[ingredientId]![currentDate] != null && requiredQuantity <= _ingredientCounts[ingredientId]![currentDate]!) {
-        _ingredientCounts[ingredientId]![currentDate] = _ingredientCounts[ingredientId]![currentDate]! - requiredQuantity;
+      // Check if there are enough ingredients for all ingredients in the menu item
+      bool enoughIngredients = true;
+      ingredients.forEach((ingredientId, requiredQuantity) {
+        if (!_ingredientCounts.containsKey(ingredientId) ||
+            !_ingredientCounts[ingredientId]!.containsKey(currentDate) ||
+            (_ingredientCounts[ingredientId]![currentDate] ?? 0) < requiredQuantity) {
+          enoughIngredients = false;
+          // print(enoughIngredients);
+        }
+      });
+
+      // If there are enough ingredients, decrement the counts for all ingredients
+      if (enoughIngredients) {
+        ingredients.forEach((ingredientId, requiredQuantity) {
+          _ingredientCounts[ingredientId]![currentDate] =
+              _ingredientCounts[ingredientId]![currentDate]! - requiredQuantity;
+        });
         _foundMenu[index]['count']++; // Increment count
-      }
+        // print(enoughIngredients);
+      } 
+      // else {
+      //   print('Out of ingredients');
+      //   // Display warning message if there are not enough ingredients
+      //   QuickAlert.show(
+      //     context: context,
+      //     type: QuickAlertType.warning,
+      //     title: 'Warning',
+      //     text: 'Not enough ingredients!',
+      //     confirmBtnColor: Colors.grey[500]!,
+      //   );
+      // }
     });
-  } else {
-    // Display warning message if there are not enough ingredients
-    QuickAlert.show(
-      context: context,
-      type: QuickAlertType.warning,
-      title: 'Warning',
-      text: 'Not enough ingredients!',
-      confirmBtnColor: Colors.grey[500]!,
-    );
   }
 }
 
@@ -218,25 +248,38 @@ Future<void> _printFileContents() async {
   }
 
   Future<void> _decreaseIngredients(List<Map<String, dynamic>> selectedItems) async {
-    final String currentDate = DateTime.now().toIso8601String().split('T').first;
+  final String currentDate = DateTime.now().toIso8601String().split('T').first;
 
-    for (var item in selectedItems) {
-      for (var ingredient in item['ingredients'].entries) {
-        final ingredientId = ingredient.key;
-        final requiredQuantity = ingredient.value * item['count'];
+  for (var item in selectedItems) {
+    for (var ingredient in item['ingredients'].entries) {
+      final ingredientId = ingredient.key;
+      final requiredQuantity = ingredient.value * item['count'];
 
-        print('Decreasing ingredient: $ingredientId by $requiredQuantity');
-        if (_ingredientCounts.containsKey(ingredientId)) {
-          if (_ingredientCounts[ingredientId]?.containsKey(currentDate) ?? false) {
-            _ingredientCounts[ingredientId]?[currentDate] =
-                (_ingredientCounts[ingredientId]?[currentDate] ?? 0) - requiredQuantity;
+      print('Decreasing ingredient: $ingredientId by $requiredQuantity');
+      if (_ingredientCounts.containsKey(ingredientId)) {
+        if (_ingredientCounts[ingredientId]?.containsKey(currentDate) ?? false) {
+          final double currentCount = _ingredientCounts[ingredientId]![currentDate] ?? 0;
+          if (currentCount >= requiredQuantity) {
+            _ingredientCounts[ingredientId]![currentDate] = currentCount - requiredQuantity;
+          } else {
+            // Display a warning if there are not enough ingredients
+            QuickAlert.show(
+              context: context,
+              type: QuickAlertType.warning,
+              title: 'Warning',
+              text: 'Not enough ingredients for ${item['name']}!',
+              confirmBtnColor: Colors.grey[500]!,
+            );
           }
         }
       }
     }
-
-    await _saveCounts();
   }
+
+  await _saveCounts();
+}
+
+
 
   @override
   Widget build(BuildContext context) {

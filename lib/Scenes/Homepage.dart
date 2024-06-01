@@ -1,12 +1,51 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:zerowastapplication/Widget/custom_scaffold.dart';
 
 
 class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+  HomePage({super.key});
+
+
+final List<Map<String, dynamic>> _allIngredients = [
+    {"id": 1, "name": "beef", "type": "meat", "unit": "kg", "picture": "assets/images/beef.jpg"},
+    {"id": 2, "name": "chicken", "type": "meat", "unit": "kg", "picture": "assets/images/chicken.jpg"},
+    {"id": 3, "name": "fish", "type": "meat", "unit": "kg", "picture": "assets/images/fish.jpg"},
+    {"id": 4, "name": "pork", "type": "meat", "unit": "kg", "picture": "assets/images/pork.jpg"},
+    {"id": 5, "name": "shrimp", "type": "meat", "unit": "kg", "picture": "assets/images/shrimp.jpg"},
+    {"id": 6, "name": "crab", "type": "meat", "unit": "kg", "picture": "assets/images/crab.jpg"},
+    {"id": 7, "name": "cabbage", "type": "vegetable", "unit": "kg", "picture": "assets/images/cabbage.jpg"},
+    {"id": 8, "name": "carrot", "type": "vegetable", "unit": "kg", "picture": "assets/images/carrot.jpg"},
+    {"id": 9, "name": "tomato", "type": "vegetable", "unit": "kg", "picture": "assets/images/tomato.jpg"},
+    {"id": 10, "name": "lime", "type": "vegetable", "unit": "kg", "picture": "assets/images/lime.jpg"},
+    {"id": 11, "name": "onion", "type": "vegetable", "unit": "kg", "picture": "assets/images/onion.jpg"},
+    {"id": 12, "name": "mushroom", "type": "vegetable", "unit": "kg", "picture": "assets/images/mushroom.jpg"},
+  ];
+
+Future<void> _initializeFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    final countFilePath = '${directory.path}/ingredient_counts.json';
+    final countFile = File(countFilePath);
+
+    if (!await countFile.exists()) {
+      // File does not exist, create and initialize it
+      final jsonData = _allIngredients.map((ingredient) => {
+            'id': ingredient['id'],
+            'count': 0, // Initializing count to zero
+          }).toList();
+      await countFile.writeAsString(jsonEncode(jsonData));
+      print('File initialized.');
+    }else{
+      print('File already exists.');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    _initializeFile(); // Call initialization method
     return CustomScaffold(
       child: Column(
         children: [

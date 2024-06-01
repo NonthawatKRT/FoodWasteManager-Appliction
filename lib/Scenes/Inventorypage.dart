@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -13,22 +14,93 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final List<Map<String, dynamic>> _allIngredients = [
-    {"id": 1, "name": "beef", "type": "meat", "unit": "kg", "picture": "assets/images/beef.jpg"},
-    {"id": 2, "name": "chicken", "type": "meat", "unit": "kg", "picture": "assets/images/chicken.jpg"},
-    {"id": 3, "name": "fish", "type": "meat", "unit": "kg", "picture": "assets/images/fish.jpg"},
-    {"id": 4, "name": "pork", "type": "meat", "unit": "kg", "picture": "assets/images/pork.jpg"},
-    {"id": 5, "name": "shrimp", "type": "meat", "unit": "kg", "picture": "assets/images/shrimp.jpg"},
-    {"id": 6, "name": "crab", "type": "meat", "unit": "kg", "picture": "assets/images/crab.jpg"},
-    {"id": 7, "name": "cabbage", "type": "vegetable", "unit": "kg", "picture": "assets/images/cabbage.jpg"},
-    {"id": 8, "name": "carrot", "type": "vegetable", "unit": "kg", "picture": "assets/images/carrot.jpg"},
-    {"id": 9, "name": "tomato", "type": "vegetable", "unit": "kg", "picture": "assets/images/tomato.jpg"},
-    {"id": 10, "name": "lime", "type": "vegetable", "unit": "kg", "picture": "assets/images/lime.jpg"},
-    {"id": 11, "name": "onion", "type": "vegetable", "unit": "kg", "picture": "assets/images/onion.jpg"},
-    {"id": 12, "name": "mushroom", "type": "vegetable", "unit": "kg", "picture": "assets/images/mushroom.jpg"},
+    {
+      "id": 1,
+      "name": "beef",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/beef.jpg"
+    },
+    {
+      "id": 2,
+      "name": "chicken",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/chicken.jpg"
+    },
+    {
+      "id": 3,
+      "name": "fish",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/fish.jpg"
+    },
+    {
+      "id": 4,
+      "name": "pork",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/pork.jpg"
+    },
+    {
+      "id": 5,
+      "name": "shrimp",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/shrimp.jpg"
+    },
+    {
+      "id": 6,
+      "name": "crab",
+      "type": "meat",
+      "unit": "kg",
+      "picture": "assets/images/crab.jpg"
+    },
+    {
+      "id": 7,
+      "name": "cabbage",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/cabbage.jpg"
+    },
+    {
+      "id": 8,
+      "name": "carrot",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/carrot.jpg"
+    },
+    {
+      "id": 9,
+      "name": "tomato",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/tomato.jpg"
+    },
+    {
+      "id": 10,
+      "name": "lime",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/lime.jpg"
+    },
+    {
+      "id": 11,
+      "name": "onion",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/onion.jpg"
+    },
+    {
+      "id": 12,
+      "name": "mushroom",
+      "type": "vegetable",
+      "unit": "kg",
+      "picture": "assets/images/mushroom.jpg"
+    },
   ];
 
   List<Map<String, dynamic>> _foundIngredients = [];
-  String _searchTerm = '';
   bool _isEditing = false;
   late File _countFile;
   Map<String, Map<String, double>> _ingredientCounts = {};
@@ -61,23 +133,26 @@ class _InventoryPageState extends State<InventoryPage> {
     final Map<String, dynamic> jsonData = json.decode(contents);
 
     setState(() {
-      _ingredientCounts = jsonData.map((key, value) => MapEntry(key, (value as Map).map((k, v) => MapEntry(k, v.toDouble()))));
+      _ingredientCounts = jsonData.map((key, value) => MapEntry(
+          key, (value as Map).map((k, v) => MapEntry(k, v.toDouble()))));
       _updateTotalCounts();
       for (var entry in _ingredientCounts.entries) {
         _controllers[entry.key] = {};
         for (var dateEntry in entry.value.entries) {
-          _controllers[entry.key]![dateEntry.key] = TextEditingController(text: dateEntry.value.toString());
+          _controllers[entry.key]![dateEntry.key] =
+              TextEditingController(text: dateEntry.value.toString());
         }
       }
     });
   }
 
   Future<void> _saveCounts() async {
-    final jsonData = _ingredientCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
+    final jsonData = _ingredientCounts.map(
+        (key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
     await _countFile.writeAsString(json.encode(jsonData));
     _updateTotalCounts();
 
-     _printFileContents(); // Print file contents after saving
+    _printFileContents(); // Print file contents after saving
   }
 
   Future<void> _printFileContents() async {
@@ -91,10 +166,13 @@ class _InventoryPageState extends State<InventoryPage> {
 
   void _runFilter(String enteredKeyword) {
     setState(() {
-      _searchTerm = enteredKeyword;
       _foundIngredients = enteredKeyword.isEmpty
           ? _allIngredients
-          : _allIngredients.where((ingredient) => ingredient["name"].toLowerCase().contains(enteredKeyword.toLowerCase())).toList();
+          : _allIngredients
+              .where((ingredient) => ingredient["name"]
+                  .toLowerCase()
+                  .contains(enteredKeyword.toLowerCase()))
+              .toList();
     });
   }
 
@@ -111,7 +189,8 @@ class _InventoryPageState extends State<InventoryPage> {
       final id = _foundIngredients[index]['id'].toString();
       if (_ingredientCounts[id]![date]! > 0) {
         _ingredientCounts[id]![date] = (_ingredientCounts[id]![date]! - 1.0);
-        _controllers[id]![date]!.text = _ingredientCounts[id]![date]!.toString();
+        _controllers[id]![date]!.text =
+            _ingredientCounts[id]![date]!.toString();
       }
     });
   }
@@ -153,7 +232,8 @@ class _InventoryPageState extends State<InventoryPage> {
       } else {
         for (var entry in _ingredientCounts.entries) {
           for (var dateEntry in entry.value.entries) {
-            _controllers[entry.key]![dateEntry.key]!.text = dateEntry.value.toString();
+            _controllers[entry.key]![dateEntry.key]!.text =
+                dateEntry.value.toString();
           }
         }
       }
@@ -177,8 +257,10 @@ class _InventoryPageState extends State<InventoryPage> {
         title: const Text('Inventory'),
         actions: [
           TextButton.icon(
-            icon: Icon(_isEditing ? Icons.check : Icons.edit, color: Color.fromARGB(255, 63, 63, 63)),
-            label: Text(_isEditing ? 'Confirm' : 'Edit', style: TextStyle(color: Color.fromARGB(255, 63, 63, 63))),
+            icon: Icon(_isEditing ? Icons.check : Icons.edit,
+                color: Color.fromARGB(255, 63, 63, 63)),
+            label: Text(_isEditing ? 'Confirm' : 'Edit',
+                style: TextStyle(color: Color.fromARGB(255, 63, 63, 63))),
             style: TextButton.styleFrom(backgroundColor: Colors.transparent),
             onPressed: _toggleEditMode,
           ),
@@ -198,7 +280,8 @@ class _InventoryPageState extends State<InventoryPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
                   ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 ),
               ),
             ),
@@ -219,7 +302,8 @@ class _InventoryPageState extends State<InventoryPage> {
                           elevation: 1,
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 13, horizontal: 13),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -234,22 +318,27 @@ class _InventoryPageState extends State<InventoryPage> {
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.only(left: 16.0),
+                                            padding: const EdgeInsets.only(
+                                                left: 16.0),
                                             child: Text(
                                               _foundIngredients[index]['name'],
-                                              style: const TextStyle(fontSize: 18),
+                                              style:
+                                                  const TextStyle(fontSize: 18),
                                             ),
                                           ),
                                           const SizedBox(height: 8),
                                           if (!_isEditing)
                                             Padding(
-                                              padding: const EdgeInsets.only(left: 16.0),
+                                              padding: const EdgeInsets.only(
+                                                  left: 16.0),
                                               child: Text(
-                                                'Count: ${_foundIngredients[index]['count']}',
-                                                style: const TextStyle(fontSize: 16),
+                                                (_foundIngredients[index]['count'] ?? 0.0).toStringAsFixed(2),
+                                                style: const TextStyle(
+                                                    fontSize: 16),
                                               ),
                                             ),
                                         ],
@@ -259,63 +348,108 @@ class _InventoryPageState extends State<InventoryPage> {
                                       TextButton(
                                         onPressed: () => _toggleDetails(index),
                                         child: Text(
-                                          _showDetails[_foundIngredients[index]['id'].toString()]! ? '▲' : '▼',
+                                          _showDetails[_foundIngredients[index]
+                                                      ['id']
+                                                  .toString()]!
+                                              ? '▲'
+                                              : '▼',
                                         ),
                                         style: TextButton.styleFrom(
                                           foregroundColor: Colors.black54,
-                                          textStyle: const TextStyle(fontSize: 16),
+                                          textStyle:
+                                              const TextStyle(fontSize: 16),
                                         ),
                                       ),
                                   ],
                                 ),
-                                if (_showDetails[_foundIngredients[index]['id'].toString()]! && !_isEditing)
+                                if (_showDetails[_foundIngredients[index]['id']
+                                        .toString()]! &&
+                                    !_isEditing)
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 50.0, top: 8),
+                                    padding: const EdgeInsets.only(
+                                        left: 50.0, top: 8),
                                     child: SingleChildScrollView(
                                       child: Column(
-                                        children: _ingredientCounts[_foundIngredients[index]['id'].toString()]!.entries.map(
-                                          (entry) => Row(
-                                            children: [
-                                              Text(entry.key, style: TextStyle(fontSize: 15)),
-                                              SizedBox(width: 10),
-                                              Text(entry.value.toString(), style: TextStyle(fontSize: 15)),
-                                            ],
-                                          ),
-                                        ).toList(),
+                                        children: _ingredientCounts[
+                                                _foundIngredients[index]['id']
+                                                    .toString()]!
+                                            .entries
+                                            .map(
+                                              (entry) => Row(
+                                                children: [
+                                                  Text(entry.key,
+                                                      style: TextStyle(
+                                                          fontSize: 15)),
+                                                  SizedBox(width: 10),
+                                                  Text(
+                                                      entry.value
+                                                          .toStringAsFixed(2),
+                                                      style: TextStyle(
+                                                          fontSize: 15)),
+                                                ],
+                                              ),
+                                            )
+                                            .toList(),
                                       ),
                                     ),
                                   ),
                                 if (_isEditing)
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 50.0, top: 8),
+                                    padding: const EdgeInsets.only(
+                                        left: 50.0, top: 8),
                                     child: SingleChildScrollView(
                                       child: Column(
-                                        children: _ingredientCounts[_foundIngredients[index]['id'].toString()]!.entries.map(
-                                          (entry) => Row(
-                                            children: [
-                                              Text(entry.key, style: TextStyle(fontSize: 15)),
-                                              SizedBox(width: 10),
-                                              IconButton(
-                                                icon: Icon(Icons.remove),
-                                                onPressed: () => _decrementCount(index, entry.key),
+                                        children: _ingredientCounts[
+                                                _foundIngredients[index]['id']
+                                                    .toString()]!
+                                            .entries
+                                            .map(
+                                              (entry) => Row(
+                                                children: [
+                                                  Text(entry.key,
+                                                      style: TextStyle(
+                                                          fontSize: 15)),
+                                                  SizedBox(width: 10),
+                                                  IconButton(
+                                                    icon: Icon(Icons.remove),
+                                                    onPressed: () =>
+                                                        _decrementCount(
+                                                            index, entry.key),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 50,
+                                                    height: 30,
+                                                    child: TextField(
+                                                      controller: _controllers[
+                                                          _foundIngredients[
+                                                                  index]['id']
+                                                              .toString()]![entry
+                                                          .key],
+                                                      keyboardType: TextInputType
+                                                          .numberWithOptions(
+                                                              decimal: true),
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      inputFormatters: [
+                                                        FilteringTextInputFormatter
+                                                            .allow(RegExp(
+                                                                r'^\d+\.?\d{0,2}')), // Limit to 2 decimal places
+                                                      ],
+                                                      onChanged: (value) =>
+                                                          _updateCount(index,
+                                                              entry.key, value),
+                                                    ),
+                                                  ),
+                                                  IconButton(
+                                                    icon: Icon(Icons.add),
+                                                    onPressed: () =>
+                                                        _incrementCount(
+                                                            index, entry.key),
+                                                  ),
+                                                ],
                                               ),
-                                              SizedBox(
-                                                width: 40,
-                                                height: 30,
-                                                child: TextField(
-                                                  controller: _controllers[_foundIngredients[index]['id'].toString()]![entry.key],
-                                                  keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                                  textAlign: TextAlign.center,
-                                                  onChanged: (value) => _updateCount(index, entry.key, value),
-                                                ),
-                                              ),
-                                              IconButton(
-                                                icon: Icon(Icons.add),
-                                                onPressed: () => _incrementCount(index, entry.key),
-                                              ),
-                                            ],
-                                          ),
-                                        ).toList(),
+                                            )
+                                            .toList(),
                                       ),
                                     ),
                                   ),
@@ -325,7 +459,8 @@ class _InventoryPageState extends State<InventoryPage> {
                         ),
                       )
                     : Center(
-                        child: Text('No results found', style: TextStyle(fontSize: 20)),
+                        child: Text('No results found',
+                            style: TextStyle(fontSize: 20)),
                       ),
               ),
             ),

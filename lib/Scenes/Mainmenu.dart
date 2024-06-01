@@ -19,7 +19,7 @@ class _MainPageContainerState extends State<MainPageContainer> {
   bool _isLoading = false;
 
   final List<Widget> _pages = [
-    const HomePage(),
+    HomePage(),
     const MenuPage(),
     AddIngredientsPage(),
     AddMenuPage(),
