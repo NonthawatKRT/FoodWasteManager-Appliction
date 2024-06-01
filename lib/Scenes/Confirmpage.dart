@@ -1,10 +1,51 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 
 class ConfirmPage extends StatelessWidget {
   final List<Map<String, dynamic>> selectedItems;
   final VoidCallback onConfirm;
+  final Map<String, Map<String, double>> ingredientCounts;
+  final File countFile;
 
-  ConfirmPage({required this.selectedItems, required this.onConfirm});
+  ConfirmPage({
+    required this.selectedItems,
+    required this.onConfirm,
+    required this.ingredientCounts,
+    required this.countFile,
+  });
+
+  Future<void> _decreaseIngredients(List<Map<String, dynamic>> selectedItems, Map<String, Map<String, double>> ingredientCounts, File countFile) async {
+    final String currentDate = DateTime.now().toIso8601String().split('T').first;
+
+    for (var item in selectedItems) {
+      for (var ingredient in item['ingredients'].entries) {
+        final ingredientId = ingredient.key;
+        final requiredQuantity = ingredient.value * item['count'];
+
+        print('Decreasing ingredient: $ingredientId by $requiredQuantity');
+        if (ingredientCounts.containsKey(ingredientId)) {
+          if (ingredientCounts[ingredientId]!.containsKey(currentDate)) {
+            ingredientCounts[ingredientId]![currentDate] =
+                (ingredientCounts[ingredientId]![currentDate] ?? 0) - requiredQuantity;
+          } else {
+            // Create a new entry for currentDate
+            ingredientCounts[ingredientId]![currentDate] = -requiredQuantity;
+          }
+        } else {
+          // Create a new entry for ingredientId and currentDate
+          ingredientCounts[ingredientId] = {currentDate: -requiredQuantity};
+        }
+      }
+    }
+
+    await _saveCountsToFile(ingredientCounts, countFile);
+  }
+
+  Future<void> _saveCountsToFile(Map<String, Map<String, double>> ingredientCounts, File countFile) async {
+    final jsonData = ingredientCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
+    await countFile.writeAsString(json.encode(jsonData));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +102,7 @@ class ConfirmPage extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   // Reset the counts
                   selectedItems.forEach((item) {
                     item['count'] = 0;
@@ -69,6 +110,9 @@ class ConfirmPage extends StatelessWidget {
 
                   // Call the onConfirm callback
                   onConfirm();
+
+                  // Decrease ingredient counts
+                  await _decreaseIngredients(selectedItems, ingredientCounts, countFile);
 
                   // Navigate back to the MenuPage
                   Navigator.pop(context);
@@ -83,7 +127,8 @@ class ConfirmPage extends StatelessWidget {
                 ),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16.0),
-                  backgroundColor: Color.fromARGB(255, 199, 232, 213), // Button color
+                  backgroundColor:
+                      Color.fromARGB(255, 199, 232, 213), // Button color
                 ),
               ),
             ),

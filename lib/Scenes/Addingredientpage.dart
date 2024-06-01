@@ -12,18 +12,18 @@ class AddIngredientsPage extends StatefulWidget {
 
 class _AddIngredientsPageState extends State<AddIngredientsPage> {
   final List<Map<String, dynamic>> _allIngredients = [
-    {"id": 1, "name": "beef", "type": "meat", "count": 0, "picture": "assets/images/beef.jpg"},
-    {"id": 2, "name": "chicken", "type": "meat", "count": 0, "picture": "assets/images/chicken.jpg"},
-    {"id": 3, "name": "fish", "type": "meat", "count": 0, "picture": "assets/images/fish.jpg"},
-    {"id": 4, "name": "pork", "type": "meat", "count": 0, "picture": "assets/images/pork.jpg"},
-    {"id": 5, "name": "shrimp", "type": "meat", "count": 0, "picture": "assets/images/shrimp.jpg"},
-    {"id": 6, "name": "crab", "type": "meat", "count": 0, "picture": "assets/images/crab.jpg"},
-    {"id": 7, "name": "cabbage", "type": "vegetable", "count": 0, "picture": "assets/images/cabbage.jpg"},
-    {"id": 8, "name": "carrot", "type": "vegetable", "count": 0, "picture": "assets/images/carrot.jpg"},
-    {"id": 9, "name": "tomato", "type": "vegetable", "count": 0, "picture": "assets/images/tomato.jpg"},
-    {"id": 10, "name": "lime", "type": "vegetable", "count": 0, "picture": "assets/images/lime.jpg"},
-    {"id": 11, "name": "onion", "type": "vegetable", "count": 0, "picture": "assets/images/onion.jpg"},
-    {"id": 12, "name": "mushroom", "type": "vegetable", "count": 0, "picture": "assets/images/mushroom.jpg"},
+    {"id": 1, "name": "beef", "type": "meat", "count": 0.0, "picture": "assets/images/beef.jpg"},
+    {"id": 2, "name": "chicken", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg"},
+    {"id": 3, "name": "fish", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg"},
+    {"id": 4, "name": "pork", "type": "meat", "count": 0.0, "picture": "assets/images/pork.jpg"},
+    {"id": 5, "name": "shrimp", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg"},
+    {"id": 6, "name": "crab", "type": "meat", "count": 0.0, "picture": "assets/images/crab.jpg"},
+    {"id": 7, "name": "cabbage", "type": "vegetable", "count": 0.0, "picture": "assets/images/cabbage.jpg"},
+    {"id": 8, "name": "carrot", "type": "vegetable", "count": 0.0, "picture": "assets/images/carrot.jpg"},
+    {"id": 9, "name": "tomato", "type": "vegetable", "count": 0.0, "picture": "assets/images/tomato.jpg"},
+    {"id": 10, "name": "lime", "type": "vegetable", "count": 0.0, "picture": "assets/images/lime.jpg"},
+    {"id": 11, "name": "onion", "type": "vegetable", "count": 0.0, "picture": "assets/images/onion.jpg"},
+    {"id": 12, "name": "mushroom", "type": "vegetable", "count": 0.0, "picture": "assets/images/mushroom.jpg"},
   ];
 
   List<Map<String, dynamic>> _foundIngredients = [];
@@ -31,7 +31,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
   String _searchTerm = '';
   bool _showFab = false;
   late File _countFile;
-  Map<String, Map<String, int>> _ingredientCounts = {};
+  Map<String, Map<String, double>> _ingredientCounts = {};
 
   @override
   void initState() {
@@ -58,7 +58,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
     final Map<String, dynamic> jsonData = json.decode(contents);
 
     setState(() {
-      _ingredientCounts = jsonData.map((key, value) => MapEntry(key, (value as Map).map((k, v) => MapEntry(k, v as int))));
+      _ingredientCounts = jsonData.map((key, value) => MapEntry(key, (value as Map).map((k, v) => MapEntry(k, (v as num).toDouble()))));
     });
 
     _printFileContents(); // Print file contents after loading
@@ -108,25 +108,28 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
 
   void _incrementCount(int index) {
     setState(() {
-      _foundIngredients[index]['count']++;
+      _foundIngredients[index]['count'] += 1.0;
       _showFab = true;
+      print('Incremented count of ${_foundIngredients[index]['name']} to ${_foundIngredients[index]['count']}');
     });
   }
 
   void _decrementCount(int index) {
     setState(() {
       if (_foundIngredients[index]['count'] > 0) {
-        _foundIngredients[index]['count']--;
+        _foundIngredients[index]['count'] -= 1.0;
         _showFab = true;
+        print('Decremented count of ${_foundIngredients[index]['name']} to ${_foundIngredients[index]['count']}');
       }
     });
   }
 
   void _updateCount(int index, String value) {
     setState(() {
-      int newCount = int.tryParse(value) ?? 0;
+      double newCount = double.tryParse(value) ?? 0.0;
       _foundIngredients[index]['count'] = newCount;
       _showFab = true;
+      print('Updated count of ${_foundIngredients[index]['name']} to $newCount');
     });
   }
 
@@ -139,11 +142,12 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
           _ingredientCounts[id] = {};
         }
         if (_ingredientCounts[id]!.containsKey(currentDate)) {
-          _ingredientCounts[id]![currentDate] = (_ingredientCounts[id]![currentDate]! + (ingredient['count'] as int)).toInt();
+          _ingredientCounts[id]![currentDate] = (_ingredientCounts[id]![currentDate]! + (ingredient['count'] as double)).toDouble();
         } else {
-          _ingredientCounts[id]![currentDate] = ingredient['count'] as int;
+          _ingredientCounts[id]![currentDate] = ingredient['count'] as double;
         }
-        ingredient['count'] = 0; // Reset the count after confirming
+        print('Confirmed count of ${ingredient['name']} for date $currentDate: ${_ingredientCounts[id]![currentDate]}');
+        ingredient['count'] = 0.0; // Reset the count after confirming
       }
     });
     _saveCounts();
@@ -196,6 +200,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
@@ -245,7 +250,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                               itemBuilder: (context, index) => Card(
                                 key: ValueKey(_foundIngredients[index]["id"]),
                                 color: Colors.grey[200],
-                                elevation: 0,
+                                elevation: 1,
                                 margin: const EdgeInsets.symmetric(vertical: 8),
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -296,7 +301,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                                                       child: TextField(
                                                         keyboardType:
                                                             TextInputType
-                                                                .number,
+                                                                .numberWithOptions(decimal: true),
                                                         controller:
                                                             TextEditingController(
                                                                 text: _foundIngredients[
