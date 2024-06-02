@@ -12,18 +12,18 @@ class AddIngredientsPage extends StatefulWidget {
 
 class _AddIngredientsPageState extends State<AddIngredientsPage> {
   final List<Map<String, dynamic>> _allIngredients = [
-    {"id": 1, "name": "beef", "type": "meat", "count": 0.0, "picture": "assets/images/beef.jpg"},
-    {"id": 2, "name": "chicken", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg"},
-    {"id": 3, "name": "fish", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg"},
-    {"id": 4, "name": "pork", "type": "meat", "count": 0.0, "picture": "assets/images/pork.jpg"},
-    {"id": 5, "name": "shrimp", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg"},
-    {"id": 6, "name": "crab", "type": "meat", "count": 0.0, "picture": "assets/images/crab.jpg"},
-    {"id": 7, "name": "cabbage", "type": "vegetable", "count": 0.0, "picture": "assets/images/cabbage.jpg"},
-    {"id": 8, "name": "carrot", "type": "vegetable", "count": 0.0, "picture": "assets/images/carrot.jpg"},
-    {"id": 9, "name": "tomato", "type": "vegetable", "count": 0.0, "picture": "assets/images/tomato.jpg"},
-    {"id": 10, "name": "lime", "type": "vegetable", "count": 0.0, "picture": "assets/images/lime.jpg"},
-    {"id": 11, "name": "onion", "type": "vegetable", "count": 0.0, "picture": "assets/images/onion.jpg"},
-    {"id": 12, "name": "mushroom", "type": "vegetable", "count": 0.0, "picture": "assets/images/mushroom.jpg"},
+    {"id": 1, "name": "เนื้อ", "type": "meat", "count": 0.0, "picture": "assets/images/beef.jpg" ,"storageDays": 5},
+    {"id": 2, "name": "ไก่", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg", "storageDays": 2},
+    {"id": 3, "name": "ปลา", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg", "storageDays": 2},
+    {"id": 4, "name": "หมู", "type": "meat", "count": 0.0, "picture": "assets/images/pork.jpg", "storageDays": 5},
+    {"id": 5, "name": "กุ้ง", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg", "storageDays": 2},
+    {"id": 6, "name": "ปู", "type": "meat", "count": 0.0, "picture": "assets/images/crab.jpg", "storageDays": 3},
+    {"id": 7, "name": "กะหล่ำ", "type": "vegetable", "count": 0.0, "picture": "assets/images/cabbage.jpg", "storageDays": 7},
+    {"id": 8, "name": "เเครอท", "type": "vegetable", "count": 0.0, "picture": "assets/images/carrot.jpg", "storageDays": 21},
+    {"id": 9, "name": "มะเขือเทศ", "type": "vegetable", "count": 0.0, "picture": "assets/images/tomato.jpg", "storageDays": 14},
+    {"id": 10, "name": "มะนาว", "type": "vegetable", "count": 0.0, "picture": "assets/images/lime.jpg", "storageDays": 28},
+    {"id": 11, "name": "หัวหอม", "type": "vegetable", "count": 0.0, "picture": "assets/images/onion.jpg", "storageDays": 21},
+    {"id": 12, "name": "เห็ด", "type": "vegetable", "count": 0.0, "picture": "assets/images/mushroom.jpg", "storageDays": 7},
   ];
 
   List<Map<String, dynamic>> _foundIngredients = [];
@@ -160,7 +160,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: const Color(0xFFC7E8D5), // Set the background color of the AppBar
         elevation: 0,
-        title: const Text('Add Ingredients'),
+        title: const Text('เพิ่มวัตถุดิบ'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -171,7 +171,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
               child: TextField(
                 onChanged: (value) => _runFilter(value),
                 decoration: const InputDecoration(
-                  labelText: 'Search',
+                  labelText: 'ค้นหาวัตถุดิบ',
                   suffixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -348,7 +348,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                             )
                           : const Center(
                               child: Text(
-                                'No results found',
+                                'ไม่พบวัตถุดิบที่ค้นหา',
                                 style: TextStyle(fontSize: 24),
                               ),
                             ),
@@ -378,6 +378,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                     headerBackgroundColor: Color(0xFF306754),
                     confirmBtnColor:  Colors.grey[500]!,
                     barrierColor:  Color.fromARGB(102, 62, 66, 64),
+                    confirmBtnText: 'ตกลง',
                   );
                 },
                 label: const Text('Confirm'),

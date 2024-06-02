@@ -12,92 +12,33 @@ class InventoryPage extends StatefulWidget {
   _InventoryPageState createState() => _InventoryPageState();
 }
 
+// "detail": "beef id: 1 can stay in refrigerator for 3-5 days"
+// "detail": "chicken id: 2 can stay in refrigerator for 1-2 days"
+// "detail": "fish id: 3 can stay in refrigerator for 2 days"
+// "detail": "pork id: 4 can stay in refrigerator for 3-5 days"
+// "detail": "shrimp id: 5 can stay in refrigerator for 1-2 days"
+// "detail": "crab id: 6 can stay in refrigerator for 2-3 days"
+// "detail": "cabbage id: 7 can stay in refrigerator for 7 days"
+// "detail": "carrot id: 8 can stay in refrigerator for 21 days"
+// "detail": "tomato id: 9 can stay in refrigerator for 7-14 days"
+// "detail": "lime id: 10 can stay in refrigerator for 14-28 days"
+// "detail": "onion id: 11 can stay in refrigerator for 7-21 days"
+// "detail": "mushroom id: 12 can stay in refrigerator for 5-7 days"
+
 class _InventoryPageState extends State<InventoryPage> {
   final List<Map<String, dynamic>> _allIngredients = [
-    {
-      "id": 1,
-      "name": "beef",
-      "type": "meat",
-      "unit": "kg",
-      "picture": "assets/images/beef.jpg"
-    },
-    {
-      "id": 2,
-      "name": "chicken",
-      "type": "meat",
-      "unit": "kg",
-      "picture": "assets/images/chicken.jpg"
-    },
-    {
-      "id": 3,
-      "name": "fish",
-      "type": "meat",
-      "unit": "kg",
-      "picture": "assets/images/fish.jpg"
-    },
-    {
-      "id": 4,
-      "name": "pork",
-      "type": "meat",
-      "unit": "kg",
-      "picture": "assets/images/pork.jpg"
-    },
-    {
-      "id": 5,
-      "name": "shrimp",
-      "type": "meat",
-      "unit": "kg",
-      "picture": "assets/images/shrimp.jpg"
-    },
-    {
-      "id": 6,
-      "name": "crab",
-      "type": "meat",
-      "unit": "kg",
-      "picture": "assets/images/crab.jpg"
-    },
-    {
-      "id": 7,
-      "name": "cabbage",
-      "type": "vegetable",
-      "unit": "kg",
-      "picture": "assets/images/cabbage.jpg"
-    },
-    {
-      "id": 8,
-      "name": "carrot",
-      "type": "vegetable",
-      "unit": "kg",
-      "picture": "assets/images/carrot.jpg"
-    },
-    {
-      "id": 9,
-      "name": "tomato",
-      "type": "vegetable",
-      "unit": "kg",
-      "picture": "assets/images/tomato.jpg"
-    },
-    {
-      "id": 10,
-      "name": "lime",
-      "type": "vegetable",
-      "unit": "kg",
-      "picture": "assets/images/lime.jpg"
-    },
-    {
-      "id": 11,
-      "name": "onion",
-      "type": "vegetable",
-      "unit": "kg",
-      "picture": "assets/images/onion.jpg"
-    },
-    {
-      "id": 12,
-      "name": "mushroom",
-      "type": "vegetable",
-      "unit": "kg",
-      "picture": "assets/images/mushroom.jpg"
-    },
+    {"id": 1, "name": "เนื้อ", "type": "meat", "count": 0.0, "picture": "assets/images/beef.jpg" ,"storageDays": 5},
+    {"id": 2, "name": "ไก่", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg", "storageDays": 2},
+    {"id": 3, "name": "ปลา", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg", "storageDays": 2},
+    {"id": 4, "name": "หมู", "type": "meat", "count": 0.0, "picture": "assets/images/pork.jpg", "storageDays": 5},
+    {"id": 5, "name": "กุ้ง", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg", "storageDays": 2},
+    {"id": 6, "name": "ปู", "type": "meat", "count": 0.0, "picture": "assets/images/crab.jpg", "storageDays": 3},
+    {"id": 7, "name": "กะหล่ำ", "type": "vegetable", "count": 0.0, "picture": "assets/images/cabbage.jpg", "storageDays": 7},
+    {"id": 8, "name": "เเครอท", "type": "vegetable", "count": 0.0, "picture": "assets/images/carrot.jpg", "storageDays": 21},
+    {"id": 9, "name": "มะเขือเทศ", "type": "vegetable", "count": 0.0, "picture": "assets/images/tomato.jpg", "storageDays": 14},
+    {"id": 10, "name": "มะนาว", "type": "vegetable", "count": 0.0, "picture": "assets/images/lime.jpg", "storageDays": 28},
+    {"id": 11, "name": "หัวหอม", "type": "vegetable", "count": 0.0, "picture": "assets/images/onion.jpg", "storageDays": 21},
+    {"id": 12, "name": "เห็ด", "type": "vegetable", "count": 0.0, "picture": "assets/images/mushroom.jpg", "storageDays": 7},
   ];
 
   List<Map<String, dynamic>> _foundIngredients = [];
@@ -185,15 +126,17 @@ class _InventoryPageState extends State<InventoryPage> {
   }
 
   void _decrementCount(int index, String date) {
-    setState(() {
-      final id = _foundIngredients[index]['id'].toString();
-      if (_ingredientCounts[id]![date]! > 0) {
-        _ingredientCounts[id]![date] = (_ingredientCounts[id]![date]! - 1.0);
-        _controllers[id]![date]!.text =
-            _ingredientCounts[id]![date]!.toString();
-      }
-    });
-  }
+  setState(() {
+    final id = _foundIngredients[index]['id'].toString();
+    if (_ingredientCounts[id]![date]! > 0 && _ingredientCounts[id]![date]! >= 1.0) {
+      _ingredientCounts[id]![date] = (_ingredientCounts[id]![date]! - 1.0);
+    } else {
+      _ingredientCounts[id]![date] = 0.0; // Keep it at zero
+    }
+    _controllers[id]![date]!.text = _ingredientCounts[id]![date]!.toString();
+  });
+}
+
 
   void _updateCount(int index, String date, String value) {
     setState(() {
@@ -254,12 +197,12 @@ class _InventoryPageState extends State<InventoryPage> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: const Color(0xFFC7E8D5),
         elevation: 0,
-        title: const Text('Inventory'),
+        title: const Text('คลังวัตถุดิบ'),
         actions: [
           TextButton.icon(
             icon: Icon(_isEditing ? Icons.check : Icons.edit,
                 color: Color.fromARGB(255, 63, 63, 63)),
-            label: Text(_isEditing ? 'Confirm' : 'Edit',
+            label: Text(_isEditing ? 'ยืนยัน' : 'เเก้ไข',
                 style: TextStyle(color: Color.fromARGB(255, 63, 63, 63))),
             style: TextButton.styleFrom(backgroundColor: Colors.transparent),
             onPressed: _toggleEditMode,
@@ -275,7 +218,7 @@ class _InventoryPageState extends State<InventoryPage> {
               child: TextField(
                 onChanged: (value) => _runFilter(value),
                 decoration: const InputDecoration(
-                  labelText: 'Search',
+                  labelText: 'ค้นหาวัตถุดิบ',
                   suffixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -459,7 +402,7 @@ class _InventoryPageState extends State<InventoryPage> {
                         ),
                       )
                     : Center(
-                        child: Text('No results found',
+                        child: Text('ไม่พบวัตถุดิบที่ค้นหา',
                             style: TextStyle(fontSize: 20)),
                       ),
               ),

@@ -8,25 +8,18 @@ import 'package:zerowastapplication/Widget/menucustom_scaffold.dart';
 import 'package:zerowastapplication/Scenes/Confirmpage.dart';
 
 class MenuScreen extends StatefulWidget {
+  const MenuScreen({super.key});
+
   @override
   _MenuScreenState createState() => _MenuScreenState();
 }
-// id 1 : beef
-// id 2 : chicken
-// id 3 : fish
-// id 4 : pork
-// id 5 : shrimp
-// id 6 : crab
 
-// id 7 : cabbage
-// id 8 : carrot
-// id 9 : tomato
-// id 10 : lime
-// id 11 : onion
-// id 12 : mushroom
+// Ingredient IDs
+// 1: beef, 2: chicken, 3: fish, 4: pork, 5: shrimp, 6: crab
+// 7: cabbage, 8: carrot, 9: tomato, 10: lime, 11: onion, 12: mushroom
 
 class _MenuScreenState extends State<MenuScreen> {
-  List<Map<String, dynamic>> _allMenu = [
+  final List<Map<String, dynamic>> _allMenu = [
     {
       "id": 1,
       "name": "กระเพราหมูสับ",
@@ -60,7 +53,7 @@ class _MenuScreenState extends State<MenuScreen> {
       "name": "ผัดไทยกุ้งสด",
       "count": 0,
       "picture": "assets/images/padtai.jpg",
-      "ingredients": {"5": 1}
+      "ingredients": {"5": 1.0}
     },
   ];
   List<Map<String, dynamic>> _foundMenu = [];
@@ -87,21 +80,25 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   Future<void> _loadCounts() async {
-  final contents = await _countFile.readAsString();
-  final jsonData = json.decode(contents);
-  _printFileContents();
-  setState(() {
-    _ingredientCounts = {};
-    jsonData.forEach((key, value) {
-      _ingredientCounts[key] = {};
-      (value as Map<String, dynamic>).forEach((k, v) {
-        _ingredientCounts[key]![k] = v.toDouble();
+    try {
+      final contents = await _countFile.readAsString();
+      final jsonData = json.decode(contents);
+      _printFileContents();
+      setState(() {
+        _ingredientCounts = {};
+        jsonData.forEach((key, value) {
+          _ingredientCounts[key] = {};
+          (value as Map<String, dynamic>).forEach((k, v) {
+            _ingredientCounts[key]![k] = v.toDouble();
+          });
+        });
       });
-    });
-  });
-}
+    } catch (e) {
+      print('Error loading counts: $e');
+    }
+  }
 
-Future<void> _printFileContents() async {
+  Future<void> _printFileContents() async {
     if (await _countFile.exists()) {
       final contents = await _countFile.readAsString();
       print('File Contents: $contents');
@@ -110,20 +107,21 @@ Future<void> _printFileContents() async {
     }
   }
 
-
   Future<void> _saveCounts() async {
-  // Round the counts to two decimal places
-  final roundedCounts = _ingredientCounts.map((key, value) {
-    final roundedValues = value.map((k, v) => MapEntry(k, v.toStringAsFixed(2)));
-    return MapEntry(key, roundedValues);
-  });
+    try {
+      final roundedCounts = _ingredientCounts.map((key, value) {
+        final roundedValues = value.map((k, v) => MapEntry(k, v.toStringAsFixed(2)));
+        return MapEntry(key, roundedValues);
+      });
 
-  final jsonData = roundedCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, double.parse(v)))));
-  await _countFile.writeAsString(json.encode(jsonData));
+      final jsonData = roundedCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, double.parse(v)))));
+      await _countFile.writeAsString(json.encode(jsonData));
 
-  _printFileContents(); // Print file contents after saving
-}
-
+      _printFileContents(); // Print file contents after saving
+    } catch (e) {
+      print('Error saving counts: $e');
+    }
+  }
 
   void _runFilter(String enteredKeyword) {
     List<Map<String, dynamic>> results = [];
@@ -142,92 +140,83 @@ Future<void> _printFileContents() async {
   }
 
   bool _hasEnoughIngredients(Map<String, dynamic> menuItem, int index) {
-  for (var ingredient in menuItem['ingredients'].entries) {
-    final ingredientId = ingredient.key;
-    final requiredQuantity = ingredient.value;
-    final currentDate = DateTime.now().toIso8601String().split('T').first;
+    for (var ingredient in menuItem['ingredients'].entries) {
+      final ingredientId = ingredient.key;
+      final requiredQuantity = ingredient.value;
 
-    print('Checking ingredient: $ingredientId');
-    print('Required: $requiredQuantity');
-    print('Available on $currentDate: ${(_ingredientCounts[ingredientId]?[currentDate] ?? 0).toStringAsFixed(2)}');
-
-
-    if (!_ingredientCounts.containsKey(ingredientId) ||
-        !_ingredientCounts[ingredientId]!.containsKey(currentDate) ||
-        (_ingredientCounts[ingredientId]![currentDate] ?? 0) < requiredQuantity) {
-      print('Out of ingredients');
-        // Display warning message if there are not enough ingredients
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.warning,
-          title: 'Warning',
-          text: 'Not enough ingredients!',
-          confirmBtnColor: Colors.grey[500]!,
-        );
+      if (!_ingredientCounts.containsKey(ingredientId)) {
+        _showWarning('มีวัตถุดิบไม่เพียงพอ');
         return false;
-    }
-  }
-  return true;
-}
+      }
 
-  void _incrementCount(int index) {
-  if (_hasEnoughIngredients(_foundMenu[index], index)) {
-    setState(() {
-      final String currentDate = DateTime.now().toIso8601String().split('T').first;
-      final ingredients = _foundMenu[index]['ingredients'];
+      double totalAvailable = 0;
+      final dates = _ingredientCounts[ingredientId]!.keys.toList()..sort();
 
-      // Check if there are enough ingredients for all ingredients in the menu item
-      bool enoughIngredients = true;
-      ingredients.forEach((ingredientId, requiredQuantity) {
-        if (!_ingredientCounts.containsKey(ingredientId) ||
-            !_ingredientCounts[ingredientId]!.containsKey(currentDate) ||
-            (_ingredientCounts[ingredientId]![currentDate] ?? 0) < requiredQuantity) {
-          enoughIngredients = false;
-          // print(enoughIngredients);
-        }
-      });
+      for (var date in dates) {
+        totalAvailable += _ingredientCounts[ingredientId]![date]!;
+        if (totalAvailable >= requiredQuantity) break;
+      }
 
-      // If there are enough ingredients, decrement the counts for all ingredients
-      if (enoughIngredients) {
-        ingredients.forEach((ingredientId, requiredQuantity) {
-          _ingredientCounts[ingredientId]![currentDate] =
-              _ingredientCounts[ingredientId]![currentDate]! - requiredQuantity;
-        });
-        _foundMenu[index]['count']++; // Increment count
-        // print(enoughIngredients);
-      } 
-      // else {
-      //   print('Out of ingredients');
-      //   // Display warning message if there are not enough ingredients
-      //   QuickAlert.show(
-      //     context: context,
-      //     type: QuickAlertType.warning,
-      //     title: 'Warning',
-      //     text: 'Not enough ingredients!',
-      //     confirmBtnColor: Colors.grey[500]!,
-      //   );
-      // }
-    });
-  }
-}
-
-  void _decrementCount(int index) {
-  setState(() {
-    if (_foundMenu[index]['count'] > 0) {
-      _foundMenu[index]['count']--;
-
-      final String currentDate = DateTime.now().toIso8601String().split('T').first;
-      final ingredientId = _foundMenu[index]['ingredients'].keys.first;
-      final requiredQuantity = _foundMenu[index]['ingredients'][ingredientId];
-
-      // Check if ingredientId and currentDate are not null
-      if (ingredientId != null && currentDate != null && requiredQuantity != null) {
-        // Increase the ingredient count by the required quantity
-        _ingredientCounts[ingredientId]![currentDate] = (_ingredientCounts[ingredientId]![currentDate] ?? 0) + requiredQuantity;
+      if (totalAvailable < requiredQuantity) {
+        _showWarning('มีวัตถุดิบไม่เพียงพอ');
+        return false;
       }
     }
-  });
-}
+    return true;
+  }
+
+  void _showWarning(String message) {
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.warning,
+      title: 'คำเตือน!',
+      text: message, 
+      confirmBtnColor: Colors.grey[500]!,
+      confirmBtnText: 'ตกลง',
+    );
+  }
+
+  void _incrementCount(int index) {
+    if (_hasEnoughIngredients(_foundMenu[index], index)) {
+      setState(() {
+        final ingredients = _foundMenu[index]['ingredients'];
+
+        ingredients.forEach((ingredientId, requiredQuantity) {
+          double remainingQuantity = requiredQuantity;
+          final dates = _ingredientCounts[ingredientId]!.keys.toList()..sort();
+
+          for (var date in dates) {
+            final availableQuantity = _ingredientCounts[ingredientId]![date]!;
+            if (availableQuantity >= remainingQuantity) {
+              _ingredientCounts[ingredientId]![date] = availableQuantity - remainingQuantity;
+              break;
+            } else {
+              _ingredientCounts[ingredientId]![date] = 0;
+              remainingQuantity -= availableQuantity;
+            }
+          }
+        });
+
+        _foundMenu[index]['count']++;
+      });
+    }
+  }
+
+  void _decrementCount(int index) {
+    setState(() {
+      if (_foundMenu[index]['count'] > 0) {
+        _foundMenu[index]['count']--;
+
+        final String currentDate = DateTime.now().toIso8601String().split('T').first;
+        final ingredientId = _foundMenu[index]['ingredients'].keys.first;
+        final requiredQuantity = _foundMenu[index]['ingredients'][ingredientId];
+
+        if (ingredientId != null && currentDate != null && requiredQuantity != null) {
+          _ingredientCounts[ingredientId]![currentDate] = (_ingredientCounts[ingredientId]![currentDate] ?? 0) + requiredQuantity;
+        }
+      }
+    });
+  }
 
   bool _hasSelectedItems() {
     return _foundMenu.any((menu) => menu['count'] > 0);
@@ -239,47 +228,40 @@ Future<void> _printFileContents() async {
 
   void _resetCounts() {
     setState(() {
-      _allMenu.forEach((menu) {
+      for (var menu in _allMenu) {
         menu['count'] = 0;
-      });
+      }
       _foundMenu = List.from(_allMenu);
     });
     _saveCounts();
   }
 
   Future<void> _decreaseIngredients(List<Map<String, dynamic>> selectedItems) async {
-  final String currentDate = DateTime.now().toIso8601String().split('T').first;
+    for (var item in selectedItems) {
+      for (var ingredient in item['ingredients'].entries) {
+        final ingredientId = ingredient.key;
+        final requiredQuantity = ingredient.value * item['count'];
 
-  for (var item in selectedItems) {
-    for (var ingredient in item['ingredients'].entries) {
-      final ingredientId = ingredient.key;
-      final requiredQuantity = ingredient.value * item['count'];
+        if (_ingredientCounts.containsKey(ingredientId)) {
+          double remainingQuantity = requiredQuantity;
+          final dates = _ingredientCounts[ingredientId]!.keys.toList()..sort();
 
-      print('Decreasing ingredient: $ingredientId by $requiredQuantity');
-      if (_ingredientCounts.containsKey(ingredientId)) {
-        if (_ingredientCounts[ingredientId]?.containsKey(currentDate) ?? false) {
-          final double currentCount = _ingredientCounts[ingredientId]![currentDate] ?? 0;
-          if (currentCount >= requiredQuantity) {
-            _ingredientCounts[ingredientId]![currentDate] = currentCount - requiredQuantity;
-          } else {
-            // Display a warning if there are not enough ingredients
-            QuickAlert.show(
-              context: context,
-              type: QuickAlertType.warning,
-              title: 'Warning',
-              text: 'Not enough ingredients for ${item['name']}!',
-              confirmBtnColor: Colors.grey[500]!,
-            );
+          for (var date in dates) {
+            final availableQuantity = _ingredientCounts[ingredientId]![date]!;
+            if (availableQuantity >= remainingQuantity) {
+              _ingredientCounts[ingredientId]![date] = availableQuantity - remainingQuantity;
+              break;
+            } else {
+              _ingredientCounts[ingredientId]![date] = 0;
+              remainingQuantity -= availableQuantity;
+            }
           }
         }
       }
     }
+
+    await _saveCounts();
   }
-
-  await _saveCounts();
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -292,8 +274,8 @@ Future<void> _printFileContents() async {
               padding: const EdgeInsets.only(bottom: 10.0),
               child: TextField(
                 onChanged: (value) => _runFilter(value),
-                decoration: InputDecoration(
-                  labelText: 'Search',
+                decoration: const InputDecoration(
+                  labelText: 'ค้นหาเมนู',
                   suffixIcon: Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
@@ -310,7 +292,7 @@ Future<void> _printFileContents() async {
                         key: ValueKey(_foundMenu[index]["id"]),
                         color: Colors.grey[200],
                         elevation: 4,
-                        margin: EdgeInsets.symmetric(vertical: 10),
+                        margin: const EdgeInsets.symmetric(vertical: 10),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
                           child: Column(
@@ -324,7 +306,7 @@ Future<void> _printFileContents() async {
                                     height: 80,
                                     fit: BoxFit.cover,
                                   ),
-                                  SizedBox(width: 16),
+                                  const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,22 +315,22 @@ Future<void> _printFileContents() async {
                                           padding: const EdgeInsets.only(left: 16.0),
                                           child: Text(
                                             _foundMenu[index]['name'],
-                                            style: TextStyle(fontSize: 18),
+                                            style: const TextStyle(fontSize: 18),
                                           ),
                                         ),
-                                        SizedBox(height: 8),
+                                        const SizedBox(height: 8),
                                         Row(
                                           children: [
                                             IconButton(
-                                              icon: Icon(Icons.remove),
+                                              icon: const Icon(Icons.remove),
                                               onPressed: () => _decrementCount(index),
                                             ),
                                             Text(
-                                              '${_foundMenu[index]["count"].toString()}',
-                                              style: TextStyle(fontSize: 16),
+                                              _foundMenu[index]["count"].toString(),
+                                              style: const TextStyle(fontSize: 16),
                                             ),
                                             IconButton(
-                                              icon: Icon(Icons.add),
+                                              icon: const Icon(Icons.add),
                                               onPressed: () => _incrementCount(index),
                                             ),
                                           ],
@@ -363,8 +345,8 @@ Future<void> _printFileContents() async {
                         ),
                       ),
                     )
-                  : Text(
-                      'No results found',
+                  : const Text(
+                      'ไม่พบเมนูที่ค้นหา',
                       style: TextStyle(fontSize: 24),
                     ),
             ),
@@ -373,27 +355,26 @@ Future<void> _printFileContents() async {
       ),
       floatingActionButton: _hasSelectedItems()
           ? FloatingActionButton(
-              child: Icon(
-                Icons.shopping_basket,
-                color: const Color.fromARGB(221, 48, 43, 43),
-              ),
-              backgroundColor: Color.fromARGB(255, 199, 232, 213),
+              backgroundColor: const Color.fromARGB(255, 199, 232, 213),
               onPressed: () async {
                 final selectedItems = _getSelectedItems();
                 await Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => ConfirmPage(
-      selectedItems: selectedItems,
-      onConfirm: _resetCounts,
-      ingredientCounts: _ingredientCounts,
-      countFile: _countFile,
-    ),
-  ),
-);
-
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ConfirmPage(
+                      selectedItems: selectedItems,
+                      onConfirm: _resetCounts,
+                      ingredientCounts: _ingredientCounts,
+                      countFile: _countFile,
+                    ),
+                  ),
+                );
                 _decreaseIngredients(selectedItems);
               },
+              child: const Icon(
+                Icons.shopping_basket,
+                color: Color.fromARGB(221, 48, 43, 43),
+              ),
             )
           : null,
       floatingActionButtonLocation: const CustomFabLocation(),
@@ -406,7 +387,7 @@ class MenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MenuCustomScaffold(
+    return const MenuCustomScaffold(
       child: MenuScreen(),
     );
   }
