@@ -27,18 +27,102 @@ class InventoryPage extends StatefulWidget {
 
 class _InventoryPageState extends State<InventoryPage> {
   final List<Map<String, dynamic>> _allIngredients = [
-    {"id": 1, "name": "เนื้อ", "type": "meat", "count": 0.0, "picture": "assets/images/beef.jpg" ,"storageDays": 5},
-    {"id": 2, "name": "ไก่", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg", "storageDays": 2},
-    {"id": 3, "name": "ปลา", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg", "storageDays": 2},
-    {"id": 4, "name": "หมู", "type": "meat", "count": 0.0, "picture": "assets/images/pork.jpg", "storageDays": 5},
-    {"id": 5, "name": "กุ้ง", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg", "storageDays": 2},
-    {"id": 6, "name": "ปู", "type": "meat", "count": 0.0, "picture": "assets/images/crab.jpg", "storageDays": 3},
-    {"id": 7, "name": "กะหล่ำ", "type": "vegetable", "count": 0.0, "picture": "assets/images/cabbage.jpg", "storageDays": 7},
-    {"id": 8, "name": "เเครอท", "type": "vegetable", "count": 0.0, "picture": "assets/images/carrot.jpg", "storageDays": 21},
-    {"id": 9, "name": "มะเขือเทศ", "type": "vegetable", "count": 0.0, "picture": "assets/images/tomato.jpg", "storageDays": 14},
-    {"id": 10, "name": "มะนาว", "type": "vegetable", "count": 0.0, "picture": "assets/images/lime.jpg", "storageDays": 28},
-    {"id": 11, "name": "หัวหอม", "type": "vegetable", "count": 0.0, "picture": "assets/images/onion.jpg", "storageDays": 21},
-    {"id": 12, "name": "เห็ด", "type": "vegetable", "count": 0.0, "picture": "assets/images/mushroom.jpg", "storageDays": 7},
+    {
+      "id": 1,
+      "name": "เนื้อ",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/beef.jpg",
+      "storageDays": 5
+    },
+    {
+      "id": 2,
+      "name": "ไก่",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/chicken.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 3,
+      "name": "ปลา",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/fish.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 4,
+      "name": "หมู",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/pork.jpg",
+      "storageDays": 5
+    },
+    {
+      "id": 5,
+      "name": "กุ้ง",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/shrimp.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 6,
+      "name": "ปู",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/crab.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 7,
+      "name": "กะหล่ำ",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/cabbage.jpg",
+      "storageDays": 7
+    },
+    {
+      "id": 8,
+      "name": "เเครอท",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/carrot.jpg",
+      "storageDays": 21
+    },
+    {
+      "id": 9,
+      "name": "มะเขือเทศ",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/tomato.jpg",
+      "storageDays": 14
+    },
+    {
+      "id": 10,
+      "name": "มะนาว",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/lime.jpg",
+      "storageDays": 28
+    },
+    {
+      "id": 11,
+      "name": "หัวหอม",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/onion.jpg",
+      "storageDays": 21
+    },
+    {
+      "id": 12,
+      "name": "เห็ด",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/mushroom.jpg",
+      "storageDays": 7
+    },
   ];
 
   List<Map<String, dynamic>> _foundIngredients = [];
@@ -69,32 +153,59 @@ class _InventoryPageState extends State<InventoryPage> {
     }
   }
 
-  Future<void> _loadCounts() async {
-    final contents = await _countFile.readAsString();
-    final Map<String, dynamic> jsonData = json.decode(contents);
+ Future<void> _loadCounts() async {
+  final contents = await _countFile.readAsString();
+  final Map<String, dynamic> jsonData = json.decode(contents);
 
-    setState(() {
-      _ingredientCounts = jsonData.map((key, value) => MapEntry(
-          key, (value as Map).map((k, v) => MapEntry(k, v.toDouble()))));
-      _updateTotalCounts();
-      for (var entry in _ingredientCounts.entries) {
-        _controllers[entry.key] = {};
-        for (var dateEntry in entry.value.entries) {
-          _controllers[entry.key]![dateEntry.key] =
-              TextEditingController(text: dateEntry.value.toString());
+  setState(() {
+    _ingredientCounts = {};
+
+    jsonData.forEach((key, value) {
+      final ingredient = _allIngredients.firstWhere((ingredient) => ingredient['id'].toString() == key);
+      final storageDays = ingredient['storageDays'];
+
+      value.forEach((date, count) {
+        if (!_isExpiredAndZeroCount(date, count, storageDays)) {
+          _ingredientCounts.putIfAbsent(key, () => {});
+          _ingredientCounts[key]![date] = count.toDouble();
         }
+      });
+
+      if (_ingredientCounts.containsKey(key)) {
+        _controllers[key] = {};
+        _ingredientCounts[key]!.forEach((date, count) {
+          _controllers[key]![date] = TextEditingController(text: count.toString());
+        });
       }
     });
-  }
+
+    _updateTotalCounts();
+  });
+}
+
+bool _isExpiredAndZeroCount(String date, double count, int storageDays) {
+  final expirationDate = DateTime.parse(date).add(Duration(days: storageDays));
+  return count == 0.0 && expirationDate.isBefore(DateTime.now());
+}
 
   Future<void> _saveCounts() async {
-    final jsonData = _ingredientCounts.map(
-        (key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
-    await _countFile.writeAsString(json.encode(jsonData));
-    _updateTotalCounts();
+  final Map<String, dynamic> jsonData = {};
 
-    _printFileContents(); // Print file contents after saving
-  }
+  _ingredientCounts.forEach((key, value) {
+    final ingredient = _allIngredients.firstWhere((ingredient) => ingredient['id'].toString() == key);
+    final storageDays = ingredient['storageDays'];
+    final filteredValue = value..removeWhere((date, count) => _isExpiredAndZeroCount(date, count, storageDays));
+
+    if (filteredValue.isNotEmpty) {
+      jsonData[key] = filteredValue;
+    }
+  });
+
+  await _countFile.writeAsString(json.encode(jsonData));
+  _updateTotalCounts();
+  _printFileContents(); // Print file contents after saving
+}
+
 
   Future<void> _printFileContents() async {
     if (await _countFile.exists()) {
@@ -126,17 +237,17 @@ class _InventoryPageState extends State<InventoryPage> {
   }
 
   void _decrementCount(int index, String date) {
-  setState(() {
-    final id = _foundIngredients[index]['id'].toString();
-    if (_ingredientCounts[id]![date]! > 0 && _ingredientCounts[id]![date]! >= 1.0) {
-      _ingredientCounts[id]![date] = (_ingredientCounts[id]![date]! - 1.0);
-    } else {
-      _ingredientCounts[id]![date] = 0.0; // Keep it at zero
-    }
-    _controllers[id]![date]!.text = _ingredientCounts[id]![date]!.toString();
-  });
-}
-
+    setState(() {
+      final id = _foundIngredients[index]['id'].toString();
+      if (_ingredientCounts[id]![date]! > 0 &&
+          _ingredientCounts[id]![date]! >= 1.0) {
+        _ingredientCounts[id]![date] = (_ingredientCounts[id]![date]! - 1.0);
+      } else {
+        _ingredientCounts[id]![date] = 0.0; // Keep it at zero
+      }
+      _controllers[id]![date]!.text = _ingredientCounts[id]![date]!.toString();
+    });
+  }
 
   void _updateCount(int index, String date, String value) {
     setState(() {
@@ -186,8 +297,45 @@ class _InventoryPageState extends State<InventoryPage> {
   void _toggleDetails(int index) {
     setState(() {
       final id = _foundIngredients[index]['id'].toString();
+      // final daysRemaining =
+      //     _calculateDaysRemaining(_foundIngredients[index]['storageDays']);
       _showDetails[id] = !_showDetails[id]!;
     });
+  }
+
+  // int _calculateDaysRemaining(int storageDays) {
+  //   final today = DateTime.now();
+  //   final expirationDate = today.add(Duration(days: storageDays));
+  //   final difference = expirationDate.difference(today);
+  //   print('Expiration Date: $expirationDate');
+  //   print('Today: $today');
+  //   print('Difference: ${difference.inDays} days');
+  //   return difference.inDays;
+  // }
+
+  final int greenThreshold = 2; // Days remaining before expiration to consider as green
+
+  Color _getColorForExpiration(DateTime expirationDate) {
+    final today = DateTime.now();
+    final difference = expirationDate.difference(today);
+    final daysRemaining = difference.inDays;
+
+    print('Expiration Date: $expirationDate');
+    print('Today: $today');
+    print('Difference: ${difference.inDays} days');
+
+    if (daysRemaining >= greenThreshold) {
+      return Colors.green; // Not close to expiration
+    } else if (daysRemaining < 1 && daysRemaining >= 0) {
+      return Colors.red; // Close to expiration or expired
+    } else {
+      return Colors.orange; // Nearing expiration
+    }
+  }
+
+  DateTime _calculateExpirationDate(int storageDays, String date) {
+    final parsedDate = DateTime.parse(date);
+    return parsedDate.add(Duration(days: storageDays));
   }
 
   @override
@@ -279,7 +427,11 @@ class _InventoryPageState extends State<InventoryPage> {
                                               padding: const EdgeInsets.only(
                                                   left: 16.0),
                                               child: Text(
-                                                (_foundIngredients[index]['count'] ?? 0.0).toStringAsFixed(2),
+                                                (_foundIngredients[index]
+                                                                ['count'] ??
+                                                            0.0)
+                                                        .toStringAsFixed(2) +
+                                                    '  kg.',
                                                 style: const TextStyle(
                                                     fontSize: 16),
                                               ),
@@ -320,15 +472,31 @@ class _InventoryPageState extends State<InventoryPage> {
                                             .map(
                                               (entry) => Row(
                                                 children: [
-                                                  Text(entry.key,
+                                                  Text(entry.key + ' : ',
                                                       style: TextStyle(
-                                                          fontSize: 15)),
+                                                        fontSize: 15,
+                                                        color: _getColorForExpiration(
+                                                            _calculateExpirationDate(
+                                                                _foundIngredients[
+                                                                        index][
+                                                                    "storageDays"],
+                                                                entry.key)),
+                                                      )),
                                                   SizedBox(width: 10),
                                                   Text(
-                                                      entry.value
-                                                          .toStringAsFixed(2),
-                                                      style: TextStyle(
-                                                          fontSize: 15)),
+                                                    entry.value.toStringAsFixed(
+                                                            2) +
+                                                        '  kg.',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      color: _getColorForExpiration(
+                                                          _calculateExpirationDate(
+                                                              _foundIngredients[
+                                                                      index][
+                                                                  "storageDays"],
+                                                              entry.key)),
+                                                    ),
+                                                  ),
                                                 ],
                                               ),
                                             )

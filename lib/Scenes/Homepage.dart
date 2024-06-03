@@ -14,6 +14,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> _expiringSoon = [];
   List<Map<String, dynamic>> _lowStock = [];
+  Map<int, double> _ingredientCounts = {};
 
   @override
   void initState() {
@@ -22,102 +23,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   final List<Map<String, dynamic>> _allIngredients = [
-    {
-      "id": 1,
-      "name": "เนื้อ",
-      "type": "meat",
-      "count": 0.0,
-      "picture": "assets/images/beef.jpg",
-      "storageDays": 5
-    },
-    {
-      "id": 2,
-      "name": "ไก่",
-      "type": "meat",
-      "count": 0.0,
-      "picture": "assets/images/chicken.jpg",
-      "storageDays": 2
-    },
-    {
-      "id": 3,
-      "name": "ปลา",
-      "type": "meat",
-      "count": 0.0,
-      "picture": "assets/images/fish.jpg",
-      "storageDays": 2
-    },
-    {
-      "id": 4,
-      "name": "หมู",
-      "type": "meat",
-      "count": 0.0,
-      "picture": "assets/images/pork.jpg",
-      "storageDays": 5
-    },
-    {
-      "id": 5,
-      "name": "กุ้ง",
-      "type": "meat",
-      "count": 0.0,
-      "picture": "assets/images/shrimp.jpg",
-      "storageDays": 2
-    },
-    {
-      "id": 6,
-      "name": "ปู",
-      "type": "meat",
-      "count": 0.0,
-      "picture": "assets/images/crab.jpg",
-      "storageDays": 3
-    },
-    {
-      "id": 7,
-      "name": "กะหล่ำ",
-      "type": "vegetable",
-      "count": 0.0,
-      "picture": "assets/images/cabbage.jpg",
-      "storageDays": 7
-    },
-    {
-      "id": 8,
-      "name": "เเครอท",
-      "type": "vegetable",
-      "count": 0.0,
-      "picture": "assets/images/carrot.jpg",
-      "storageDays": 21
-    },
-    {
-      "id": 9,
-      "name": "มะเขือเทศ",
-      "type": "vegetable",
-      "count": 0.0,
-      "picture": "assets/images/tomato.jpg",
-      "storageDays": 14
-    },
-    {
-      "id": 10,
-      "name": "มะนาว",
-      "type": "vegetable",
-      "count": 0.0,
-      "picture": "assets/images/lime.jpg",
-      "storageDays": 28
-    },
-    {
-      "id": 11,
-      "name": "หัวหอม",
-      "type": "vegetable",
-      "count": 0.0,
-      "picture": "assets/images/onion.jpg",
-      "storageDays": 21
-    },
-    {
-      "id": 12,
-      "name": "เห็ด",
-      "type": "vegetable",
-      "count": 0.0,
-      "picture": "assets/images/mushroom.jpg",
-      "storageDays": 7
-    },
+    {"id": 1, "name": "เนื้อ", "type": "meat", "count": 0.0, "picture": "assets/images/beef.jpg", "storageDays": 5},
+    {"id": 2, "name": "ไก่", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg", "storageDays": 3},
+    {"id": 3, "name": "ปลา", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg", "storageDays": 3},
+    {"id": 4, "name": "หมู", "type": "meat", "count": 0.0, "picture": "assets/images/pork.jpg", "storageDays": 5},
+    {"id": 5, "name": "กุ้ง", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg", "storageDays": 3},
+    {"id": 6, "name": "ปู", "type": "meat", "count": 0.0, "picture": "assets/images/crab.jpg", "storageDays": 3},
+    {"id": 7, "name": "กะหล่ำ", "type": "vegetable", "count": 0.0, "picture": "assets/images/cabbage.jpg", "storageDays": 7},
+    {"id": 8, "name": "เเครอท", "type": "vegetable", "count": 0.0, "picture": "assets/images/carrot.jpg", "storageDays": 21},
+    {"id": 9, "name": "มะเขือเทศ", "type": "vegetable", "count": 0.0, "picture": "assets/images/tomato.jpg", "storageDays": 14},
+    {"id": 10, "name": "มะนาว", "type": "vegetable", "count": 0.0, "picture": "assets/images/lime.jpg", "storageDays": 28},
+    {"id": 11, "name": "หัวหอม", "type": "vegetable", "count": 0.0, "picture": "assets/images/onion.jpg", "storageDays": 21},
+    {"id": 12, "name": "เห็ด", "type": "vegetable", "count": 0.0, "picture": "assets/images/mushroom.jpg", "storageDays": 7},
   ];
 
   Future<void> _initializeFile() async {
@@ -152,20 +69,26 @@ class _HomePageState extends State<HomePage> {
 
       final contents = await countFile.readAsString();
       print('File contents: $contents'); // Print the contents for debugging
-      final jsonData = json.decode(contents);
+      final List<dynamic> jsonData = json.decode(contents) as List<dynamic>;
 
       final now = DateTime.now();
 
       setState(() {
         _expiringSoon = [];
         _lowStock = [];
+        _ingredientCounts = {};
 
-        jsonData.forEach((id, data) {
-          final count = data[now.toString()] ?? 0.0;
-          final ingredient =
-              _allIngredients.firstWhere((ing) => ing['id'] == int.parse(id));
-          final expirationDate =
-              now.add(Duration(days: ingredient['storageDays']));
+        for (var item in jsonData) {
+          final id = item['id'] as int;
+          final count = item['count'] as double;
+          final addedDate = DateTime.parse(item['addedDate']);
+
+          _ingredientCounts[id] = count;
+
+          final ingredient = _allIngredients.firstWhere((ing) => ing['id'] == id);
+          ingredient['count'] = count;
+
+          final expirationDate = addedDate.add(Duration(days: ingredient['storageDays']));
           final remainingDays = expirationDate.difference(now).inDays;
 
           if (remainingDays <= 2) {
@@ -183,7 +106,7 @@ class _HomePageState extends State<HomePage> {
               'picture': ingredient['picture'],
             });
           }
-        });
+        }
       });
     } catch (e) {
       print('Error loading counts: $e');
@@ -197,8 +120,7 @@ class _HomePageState extends State<HomePage> {
         builder: (context) => ExpPage(
           title: title,
           items: items,
-          showCount: title !=
-              'Expiring Soon', // Pass a boolean indicating whether to show count
+          showCount: title != 'Expiring Soon',
         ),
       ),
     );
@@ -232,21 +154,18 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 60),
                 GestureDetector(
-                  onTap: () =>
-                      _navigateToDetails('Expiring Soon', _expiringSoon),
+                  onTap: () => _navigateToDetails('Expiring Soon', _expiringSoon),
                   child: Card(
                     elevation: 2,
                     child: ListTile(
                       leading: Icon(Icons.warning, color: Colors.orange),
                       title: Text(
                         'Expiring Soon',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildSummaryList(
-                            _expiringSoon), // Display summary list
+                        children: _buildSummaryList(_expiringSoon),
                       ),
                     ),
                   ),
@@ -260,13 +179,11 @@ class _HomePageState extends State<HomePage> {
                       leading: Icon(Icons.warning, color: Colors.red),
                       title: Text(
                         'Low Stock',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: _buildSummaryList(
-                            _lowStock), // Display summary list
+                        children: _buildSummaryList(_lowStock),
                       ),
                     ),
                   ),
@@ -295,8 +212,7 @@ class _HomePageState extends State<HomePage> {
         GestureDetector(
           onTap: () {
             // Navigate to the detailed view
-            _navigateToDetails(
-                items == _expiringSoon ? 'Expiring Soon' : 'Low Stock', items);
+            _navigateToDetails(items == _expiringSoon ? 'Expiring Soon' : 'Low Stock', items);
           },
           child: Text(
             'See more...',

@@ -19,6 +19,105 @@ class MenuScreen extends StatefulWidget {
 // 7: cabbage, 8: carrot, 9: tomato, 10: lime, 11: onion, 12: mushroom
 
 class _MenuScreenState extends State<MenuScreen> {
+  final List<Map<String, dynamic>> _allIngredients = [
+    {
+      "id": 1,
+      "name": "เนื้อ",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/beef.jpg",
+      "storageDays": 5
+    },
+    {
+      "id": 2,
+      "name": "ไก่",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/chicken.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 3,
+      "name": "ปลา",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/fish.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 4,
+      "name": "หมู",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/pork.jpg",
+      "storageDays": 5
+    },
+    {
+      "id": 5,
+      "name": "กุ้ง",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/shrimp.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 6,
+      "name": "ปู",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/crab.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 7,
+      "name": "กะหล่ำ",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/cabbage.jpg",
+      "storageDays": 7
+    },
+    {
+      "id": 8,
+      "name": "เเครอท",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/carrot.jpg",
+      "storageDays": 21
+    },
+    {
+      "id": 9,
+      "name": "มะเขือเทศ",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/tomato.jpg",
+      "storageDays": 14
+    },
+    {
+      "id": 10,
+      "name": "มะนาว",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/lime.jpg",
+      "storageDays": 28
+    },
+    {
+      "id": 11,
+      "name": "หัวหอม",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/onion.jpg",
+      "storageDays": 21
+    },
+    {
+      "id": 12,
+      "name": "เห็ด",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/mushroom.jpg",
+      "storageDays": 7
+    },
+  ];
+
   final List<Map<String, dynamic>> _allMenu = [
     {
       "id": 1,
@@ -109,18 +208,29 @@ class _MenuScreenState extends State<MenuScreen> {
 
   Future<void> _saveCounts() async {
     try {
-      final roundedCounts = _ingredientCounts.map((key, value) {
-        final roundedValues = value.map((k, v) => MapEntry(k, v.toStringAsFixed(2)));
-        return MapEntry(key, roundedValues);
+      final Map<String, dynamic> jsonData = {};
+
+      _ingredientCounts.forEach((key, value) {
+        final ingredient = _allIngredients.firstWhere((ingredient) => ingredient['id'].toString() == key);
+        final storageDays = ingredient['storageDays'];
+        final filteredValue = value..removeWhere((date, count) => _isExpiredAndZeroCount(date, count, storageDays));
+
+        if (filteredValue.isNotEmpty) {
+          jsonData[key] = filteredValue;
+        }
       });
 
-      final jsonData = roundedCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, double.parse(v)))));
       await _countFile.writeAsString(json.encode(jsonData));
-
+      // _updateTotalCounts();
       _printFileContents(); // Print file contents after saving
     } catch (e) {
       print('Error saving counts: $e');
     }
+  }
+
+  bool _isExpiredAndZeroCount(String date, double count, int storageDays) {
+    final expirationDate = DateTime.parse(date).add(Duration(days: storageDays));
+    return count == 0.0 && expirationDate.isBefore(DateTime.now());
   }
 
   void _runFilter(String enteredKeyword) {

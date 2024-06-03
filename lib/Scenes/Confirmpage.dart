@@ -51,7 +51,7 @@ class ConfirmPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Confirm Order'),
+        title: Text('ยืนยันการสั่งอาหาร'),
         backgroundColor: Color.fromARGB(255, 199, 232, 213),
       ),
       body: Padding(
@@ -87,7 +87,7 @@ class ConfirmPage extends StatelessWidget {
                               ),
                               SizedBox(height: 8),
                               Text(
-                                'Count: ${selectedItems[index]["count"].toString()}',
+                                'จำนวน: ${selectedItems[index]["count"].toString()} จาน',
                                 style: TextStyle(fontSize: 16),
                               ),
                             ],
@@ -118,7 +118,7 @@ class ConfirmPage extends StatelessWidget {
                   Navigator.pop(context);
                 },
                 child: Text(
-                  'Confirm',
+                  'ยืนยัน',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,

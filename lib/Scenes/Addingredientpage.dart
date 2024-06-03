@@ -13,10 +13,10 @@ class AddIngredientsPage extends StatefulWidget {
 class _AddIngredientsPageState extends State<AddIngredientsPage> {
   final List<Map<String, dynamic>> _allIngredients = [
     {"id": 1, "name": "เนื้อ", "type": "meat", "count": 0.0, "picture": "assets/images/beef.jpg" ,"storageDays": 5},
-    {"id": 2, "name": "ไก่", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg", "storageDays": 2},
-    {"id": 3, "name": "ปลา", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg", "storageDays": 2},
+    {"id": 2, "name": "ไก่", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg", "storageDays": 3},
+    {"id": 3, "name": "ปลา", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg", "storageDays": 3},
     {"id": 4, "name": "หมู", "type": "meat", "count": 0.0, "picture": "assets/images/pork.jpg", "storageDays": 5},
-    {"id": 5, "name": "กุ้ง", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg", "storageDays": 2},
+    {"id": 5, "name": "กุ้ง", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg", "storageDays": 3},
     {"id": 6, "name": "ปู", "type": "meat", "count": 0.0, "picture": "assets/images/crab.jpg", "storageDays": 3},
     {"id": 7, "name": "กะหล่ำ", "type": "vegetable", "count": 0.0, "picture": "assets/images/cabbage.jpg", "storageDays": 7},
     {"id": 8, "name": "เเครอท", "type": "vegetable", "count": 0.0, "picture": "assets/images/carrot.jpg", "storageDays": 21},
@@ -381,7 +381,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                     confirmBtnText: 'ตกลง',
                   );
                 },
-                label: const Text('Confirm'),
+                label: const Text('ยืนยัน'),
                 icon: const Icon(Icons.check),
                 backgroundColor: const Color(0xFFC7E8D5),
               ),
