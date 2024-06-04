@@ -276,7 +276,20 @@ class _HomePageState extends State<HomePage> {
           Container(
             color: Colors.grey[200],
             height: 165, // Set a fixed height for the scrollable area
-            child: ListView.builder(
+            child: items.isEmpty
+                ? Center(
+                    child: Text(
+                      title == 'วัตถุดิบใกล้หมดอายุ'
+                          ? 'ไม่มีวัตถุดิบที่ใกล้หมดอายุ'
+                          : 'ไม่มีวัตถุดิบที่เหลือน้อย',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  )
+                :
+            ListView.builder(
               shrinkWrap: true,
               itemCount: items.length,
               itemBuilder: (context, index) {

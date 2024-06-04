@@ -100,14 +100,48 @@ class _MainPageContainerState extends State<MainPageContainer> {
           baseColor: Colors.grey[300]!,
           highlightColor: Colors.grey[100]!,
           child: Container(
-            color: Colors.grey[300],
-            child: const Center(child: Text('Loading Home Page...')),
+            color: Colors.grey[350], // Background color for the whole page
+            child: Column(
+              children: [
+                Container(
+                  height: 100,
+                  color: Colors.grey[350],
+                  child: Center(
+                    child: Container(
+                      height: 60,
+                      width: 60,
+                      color: Colors.grey[400],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  height: 200,
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(15), // Rounded corners
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Container(
+                  height: 200,
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(15), // Rounded corners
+                  ),
+                ),
+              ],
+            ),
           ),
         );
+
       case 1:
         return Container(
           color: Colors.grey[200], // Grey background
-          padding: const EdgeInsets.only(top: 0), // Add padding to start below the app bar
+          padding: const EdgeInsets.only(
+              top: 0), // Add padding to start below the app bar
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -139,7 +173,8 @@ class _MainPageContainerState extends State<MainPageContainer> {
                   itemCount: 6, // Number of shimmer items
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 35.0, vertical: 8.0),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 35.0, vertical: 8.0),
                       child: Shimmer.fromColors(
                         baseColor: Colors.grey[300]!,
                         highlightColor: Colors.grey[100]!,
@@ -177,8 +212,10 @@ class _MainPageContainerState extends State<MainPageContainer> {
                               ),
                               const SizedBox(width: 16),
                               Container(
-                                width: 50, // Adjust width according to your design
-                                height: 50, // Adjust height according to your design
+                                width:
+                                    50, // Adjust width according to your design
+                                height:
+                                    50, // Adjust height according to your design
                                 color: Colors.grey[300],
                               ),
                             ],
@@ -210,7 +247,8 @@ class _MainPageContainerState extends State<MainPageContainer> {
               ),
               const SizedBox(height: 8),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -226,7 +264,8 @@ class _MainPageContainerState extends State<MainPageContainer> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4), // Apply padding
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 4), // Apply padding
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
@@ -236,7 +275,9 @@ class _MainPageContainerState extends State<MainPageContainer> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 30), // Apply vertical padding to the row
+                          padding: const EdgeInsets.symmetric(
+                              vertical:
+                                  30), // Apply vertical padding to the row
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -284,7 +325,9 @@ class _MainPageContainerState extends State<MainPageContainer> {
                           child: ListView.builder(
                             itemCount: 6,
                             itemBuilder: (context, index) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16), // Apply vertical padding
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 16), // Apply vertical padding
                               child: Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
@@ -335,7 +378,8 @@ class _MainPageContainerState extends State<MainPageContainer> {
               ),
               const SizedBox(height: 8),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Shimmer.fromColors(
                   baseColor: Colors.grey[300]!,
                   highlightColor: Colors.grey[100]!,
@@ -351,7 +395,8 @@ class _MainPageContainerState extends State<MainPageContainer> {
               ),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4), // Apply padding
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 4), // Apply padding
                   child: Container(
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
@@ -364,7 +409,9 @@ class _MainPageContainerState extends State<MainPageContainer> {
                           child: ListView.builder(
                             itemCount: 6,
                             itemBuilder: (context, index) => Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16), // Apply vertical padding
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 16), // Apply vertical padding
                               child: Shimmer.fromColors(
                                 baseColor: Colors.grey[300]!,
                                 highlightColor: Colors.grey[100]!,
