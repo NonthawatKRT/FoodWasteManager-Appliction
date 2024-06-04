@@ -227,7 +227,7 @@ class _HomePageState extends State<HomePage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 10),
-                Text(
+                const Text(
                   textAlign: TextAlign.center,
                   'FOOD WASTE MANAGER',
                   style: TextStyle(
@@ -268,11 +268,11 @@ class _HomePageState extends State<HomePage> {
             leading: Icon(Icons.warning, color: iconColor),
             title: Text(
               title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
             ),
             dense: true,
           ),
-          Divider(),
+          const Divider(),
           Container(
             color: Colors.grey[200],
             height: 165, // Set a fixed height for the scrollable area

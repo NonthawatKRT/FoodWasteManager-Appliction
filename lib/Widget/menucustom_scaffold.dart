@@ -11,9 +11,9 @@ class MenuCustomScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Color(0xFFC7E8D5), // Set the background color of the AppBar
+        backgroundColor: const Color(0xFFC7E8D5), // Set the background color of the AppBar
         elevation: 0,
-        title: Text('เมนู'),
+        title: const Text('เมนู'),
       ),
       extendBodyBehindAppBar: false, // Ensure body does not extend behind the AppBar
       body: Stack(

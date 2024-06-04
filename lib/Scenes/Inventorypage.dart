@@ -129,8 +129,8 @@ class _InventoryPageState extends State<InventoryPage> {
   bool _isEditing = false;
   late File _countFile;
   Map<String, Map<String, double>> _ingredientCounts = {};
-  Map<String, bool> _showDetails = {};
-  Map<String, Map<String, TextEditingController>> _controllers = {};
+  final Map<String, bool> _showDetails = {};
+  final Map<String, Map<String, TextEditingController>> _controllers = {};
 
   @override
   void initState() {
@@ -283,7 +283,7 @@ class _InventoryPageState extends State<InventoryPage> {
           text: 'กำลังบันทึกการเปลี่ยนแปลง',
         );
 
-        Future.delayed(Duration(seconds: 3), () {
+        Future.delayed(const Duration(seconds: 3), () {
           _saveCounts();
           _updateTotalCounts();
           Navigator.pop(context);
@@ -355,9 +355,9 @@ class _InventoryPageState extends State<InventoryPage> {
         actions: [
           TextButton.icon(
             icon: Icon(_isEditing ? Icons.check : Icons.edit,
-                color: Color.fromARGB(255, 63, 63, 63)),
+                color: const Color.fromARGB(255, 63, 63, 63)),
             label: Text(_isEditing ? 'ยืนยัน' : 'เเก้ไข',
-                style: TextStyle(color: Color.fromARGB(255, 63, 63, 63))),
+                style: const TextStyle(color: Color.fromARGB(255, 63, 63, 63))),
             style: TextButton.styleFrom(backgroundColor: Colors.transparent),
             onPressed: _toggleEditMode,
           ),
@@ -496,7 +496,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                                     "storageDays"],
                                                                 entry.key)),
                                                       )),
-                                                  SizedBox(width: 10),
+                                                  const SizedBox(width: 10),
                                                   Text(
                                                     entry.value.toStringAsFixed(
                                                             2) +
@@ -532,11 +532,11 @@ class _InventoryPageState extends State<InventoryPage> {
                                               (entry) => Row(
                                                 children: [
                                                   Text(entry.key,
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                           fontSize: 15)),
-                                                  SizedBox(width: 10),
+                                                  const SizedBox(width: 10),
                                                   IconButton(
-                                                    icon: Icon(Icons.remove),
+                                                    icon: const Icon(Icons.remove),
                                                     onPressed: () =>
                                                         _decrementCount(
                                                             index, entry.key),
@@ -550,7 +550,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                                   index]['id']
                                                               .toString()]![entry
                                                           .key],
-                                                      keyboardType: TextInputType
+                                                      keyboardType: const TextInputType
                                                           .numberWithOptions(
                                                               decimal: true),
                                                       textAlign:
@@ -566,7 +566,7 @@ class _InventoryPageState extends State<InventoryPage> {
                                                     ),
                                                   ),
                                                   IconButton(
-                                                    icon: Icon(Icons.add),
+                                                    icon: const Icon(Icons.add),
                                                     onPressed: () =>
                                                         _incrementCount(
                                                             index, entry.key),
@@ -583,7 +583,7 @@ class _InventoryPageState extends State<InventoryPage> {
                           ),
                         ),
                       )
-                    : Center(
+                    : const Center(
                         child: Text('ไม่พบวัตถุดิบที่ค้นหา',
                             style: TextStyle(fontSize: 20)),
                       ),

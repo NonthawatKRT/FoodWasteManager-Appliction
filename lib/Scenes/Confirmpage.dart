@@ -8,7 +8,7 @@ class ConfirmPage extends StatelessWidget {
   final Map<String, Map<String, double>> ingredientCounts;
   final File countFile;
 
-  ConfirmPage({
+  const ConfirmPage({super.key, 
     required this.selectedItems,
     required this.onConfirm,
     required this.ingredientCounts,
@@ -51,8 +51,8 @@ class ConfirmPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ยืนยันการสั่งอาหาร'),
-        backgroundColor: Color.fromARGB(255, 199, 232, 213),
+        title: const Text('ยืนยันการสั่งอาหาร'),
+        backgroundColor: const Color.fromARGB(255, 199, 232, 213),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -65,7 +65,7 @@ class ConfirmPage extends StatelessWidget {
                   key: ValueKey(selectedItems[index]["id"]),
                   color: Colors.grey[200],
                   elevation: 4,
-                  margin: EdgeInsets.symmetric(vertical: 10),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -76,19 +76,19 @@ class ConfirmPage extends StatelessWidget {
                           height: 80,
                           fit: BoxFit.cover,
                         ),
-                        SizedBox(width: 16),
+                        const SizedBox(width: 16),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 selectedItems[index]['name'],
-                                style: TextStyle(fontSize: 18),
+                                style: const TextStyle(fontSize: 18),
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 'จำนวน: ${selectedItems[index]["count"].toString()} จาน',
-                                style: TextStyle(fontSize: 16),
+                                style: const TextStyle(fontSize: 16),
                               ),
                             ],
                           ),
@@ -104,9 +104,9 @@ class ConfirmPage extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () async {
                   // Reset the counts
-                  selectedItems.forEach((item) {
+                  for (var item in selectedItems) {
                     item['count'] = 0;
-                  });
+                  }
 
                   // Call the onConfirm callback
                   onConfirm();
@@ -117,18 +117,18 @@ class ConfirmPage extends StatelessWidget {
                   // Navigate back to the MenuPage
                   Navigator.pop(context);
                 },
-                child: Text(
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  backgroundColor:
+                      const Color.fromARGB(255, 199, 232, 213), // Button color
+                ),
+                child: const Text(
                   'ยืนยัน',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
                   ),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16.0),
-                  backgroundColor:
-                      Color.fromARGB(255, 199, 232, 213), // Button color
                 ),
               ),
             ),

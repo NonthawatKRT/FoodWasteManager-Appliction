@@ -7,7 +7,7 @@ import 'package:zerowastapplication/Scenes/Menupage.dart';
 
 final List<Widget> _pages = [
   HomePage(),
-  MenuPage(),
+  const MenuPage(),
   AddIngredientsPage(),
   AddMenuPage(),
   InventoryPage(),

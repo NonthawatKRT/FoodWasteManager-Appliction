@@ -6,6 +6,8 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 class AddIngredientsPage extends StatefulWidget {
+  const AddIngredientsPage({super.key});
+
   @override
   _AddIngredientsPageState createState() => _AddIngredientsPageState();
 }
@@ -301,6 +303,11 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                       children: [
                         ElevatedButton(
                           onPressed: () => _filterByType('all'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _selectedType == 'all'
+                                ? const Color(0xFFC7E8D5)
+                                : const Color.fromARGB(197, 208, 208, 208),
+                          ),
                           child: const Text(
                             'ทั้งหมด',
                             style: TextStyle(
@@ -309,14 +316,14 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _selectedType == 'all'
-                                ? const Color(0xFFC7E8D5)
-                                : const Color.fromARGB(197, 208, 208, 208),
-                          ),
                         ),
                         ElevatedButton(
                           onPressed: () => _filterByType('vegetable'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _selectedType == 'vegetable'
+                                ? const Color(0xFFC7E8D5)
+                                : const Color.fromARGB(197, 208, 208, 208),
+                          ),
                           child: const Text(
                             'ผัก/ผลไม้',
                             style: TextStyle(
@@ -325,25 +332,20 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _selectedType == 'vegetable'
-                                ? const Color(0xFFC7E8D5)
-                                : const Color.fromARGB(197, 208, 208, 208),
-                          ),
                         ),
                         ElevatedButton(
                           onPressed: () => _filterByType('meat'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _selectedType == 'meat'
+                                ? const Color(0xFFC7E8D5)
+                                : const Color.fromARGB(197, 208, 208, 208),
+                          ),
                           child: const Text(
                             'เนื้อสัตว์',
                             style: TextStyle(
                               color: Colors.black87,
                               fontSize: 14,
                             ),
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: _selectedType == 'meat'
-                                ? const Color(0xFFC7E8D5)
-                                : const Color.fromARGB(197, 208, 208, 208),
                           ),
                         ),
                       ],
@@ -405,12 +407,12 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                                                           _decrementCount(
                                                               index),
                                                     ),
-                                                    Container(
+                                                    SizedBox(
                                                       width: 50,
                                                       height:
                                                           30, // Set the height of the TextField
                                                       child: TextField(
-                                                        keyboardType: TextInputType
+                                                        keyboardType: const TextInputType
                                                             .numberWithOptions(
                                                                 decimal: true),
                                                         controller:
@@ -475,7 +477,7 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
         alignment: Alignment.bottomRight,
         children: [
           Container(
-            margin: EdgeInsets.only(left: 16.0, bottom: 16.0),
+            margin: const EdgeInsets.only(left: 16.0, bottom: 16.0),
             child: Visibility(
               visible: _showFab,
               child: FloatingActionButton.extended(
@@ -486,9 +488,9 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                     type: QuickAlertType.success,
                     title: 'สำเร็จ',
                     text: 'เพิ่มวัตถุดิบลงในระบบเรียบร้อย',
-                    headerBackgroundColor: Color(0xFF306754),
+                    headerBackgroundColor: const Color(0xFF306754),
                     confirmBtnColor: Colors.grey[500]!,
-                    barrierColor: Color.fromARGB(102, 62, 66, 64),
+                    barrierColor: const Color.fromARGB(102, 62, 66, 64),
                     confirmBtnText: 'ตกลง',
                   );
                 },

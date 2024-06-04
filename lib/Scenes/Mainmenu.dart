@@ -101,7 +101,7 @@ class _MainPageContainerState extends State<MainPageContainer> {
           highlightColor: Colors.grey[100]!,
           child: Container(
             color: Colors.grey[300],
-            child: Center(child: Text('Loading Home Page...')),
+            child: const Center(child: Text('Loading Home Page...')),
           ),
         );
       case 1:
@@ -117,7 +117,7 @@ class _MainPageContainerState extends State<MainPageContainer> {
                 child: Container(
                   height: 56.0, // Height of the app bar
                   color: Colors.grey[300],
-                  child: Center(child: Text('Loading App Bar...')),
+                  child: const Center(child: Text('Loading App Bar...')),
                 ),
               ),
               Padding(
@@ -194,7 +194,7 @@ class _MainPageContainerState extends State<MainPageContainer> {
         );
       case 2:
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 0),
+          padding: const EdgeInsets.symmetric(horizontal: 0),
           color: Colors.grey[200], // Grey background
           child: Column(
             children: [
@@ -205,10 +205,10 @@ class _MainPageContainerState extends State<MainPageContainer> {
                   height: 56.0,
                   width: double.infinity,
                   color: Colors.grey[300],
-                  child: Center(child: Text('Loading App Bar...')),
+                  child: const Center(child: Text('Loading App Bar...')),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Shimmer.fromColors(
@@ -314,12 +314,12 @@ class _MainPageContainerState extends State<MainPageContainer> {
           highlightColor: Colors.grey[100]!,
           child: Container(
             color: Colors.grey[300],
-            child: Center(child: Text('Loading Add Menu Page...')),
+            child: const Center(child: Text('Loading Add Menu Page...')),
           ),
         );
       case 4:
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 0),
+          padding: const EdgeInsets.symmetric(horizontal: 0),
           color: Colors.grey[200], // Grey background
           child: Column(
             children: [
@@ -330,10 +330,10 @@ class _MainPageContainerState extends State<MainPageContainer> {
                   height: 56.0,
                   width: double.infinity,
                   color: Colors.grey[300],
-                  child: Center(child: Text('Loading App Bar...')),
+                  child: const Center(child: Text('Loading App Bar...')),
                 ),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                 child: Shimmer.fromColors(

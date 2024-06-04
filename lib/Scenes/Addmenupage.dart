@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AddMenuPage extends StatelessWidget {
+  const AddMenuPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('ปรับเเต่งรายการอาหาร'),
-        backgroundColor: Color.fromARGB(255, 199, 232, 213),
+        title: const Text('ปรับเเต่งรายการอาหาร'),
+        backgroundColor: const Color.fromARGB(255, 199, 232, 213),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -14,9 +16,9 @@ class AddMenuPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(height: 50,),
+              const SizedBox(height: 50,),
               Icon(Icons.construction, size: 100, color: Colors.yellow[800]),
-              Text(
+              const Text(
                 'This page is under development',
                 style: TextStyle(
                   fontSize: 24,
@@ -24,13 +26,13 @@ class AddMenuPage extends StatelessWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              Text(
+              const Text(
                 'อยู่ระหว่างการพัฒนา',
                 style: TextStyle(fontSize: 19),
               ),
-              SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
+              const SizedBox(height: 30),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 50),
                 child: Text(
                   'ขออภัยในความไม่สะดวก',
                   style: TextStyle(fontSize: 20,
