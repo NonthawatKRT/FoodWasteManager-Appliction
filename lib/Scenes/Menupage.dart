@@ -34,7 +34,7 @@ class _MenuScreenState extends State<MenuScreen> {
       "type": "meat",
       "count": 0.0,
       "picture": "assets/images/chicken.jpg",
-      "storageDays": 3
+      "storageDays": 5
     },
     {
       "id": 3,
@@ -82,7 +82,7 @@ class _MenuScreenState extends State<MenuScreen> {
       "type": "vegetable",
       "count": 0.0,
       "picture": "assets/images/carrot.jpg",
-      "storageDays": 21
+      "storageDays": 7
     },
     {
       "id": 9,
@@ -90,7 +90,7 @@ class _MenuScreenState extends State<MenuScreen> {
       "type": "vegetable",
       "count": 0.0,
       "picture": "assets/images/tomato.jpg",
-      "storageDays": 14
+      "storageDays": 7
     },
     {
       "id": 10,
@@ -98,7 +98,7 @@ class _MenuScreenState extends State<MenuScreen> {
       "type": "vegetable",
       "count": 0.0,
       "picture": "assets/images/lime.jpg",
-      "storageDays": 28
+      "storageDays": 10
     },
     {
       "id": 11,
@@ -106,7 +106,7 @@ class _MenuScreenState extends State<MenuScreen> {
       "type": "vegetable",
       "count": 0.0,
       "picture": "assets/images/onion.jpg",
-      "storageDays": 21
+      "storageDays": 10
     },
     {
       "id": 12,
@@ -211,9 +211,12 @@ class _MenuScreenState extends State<MenuScreen> {
       final Map<String, dynamic> jsonData = {};
 
       _ingredientCounts.forEach((key, value) {
-        final ingredient = _allIngredients.firstWhere((ingredient) => ingredient['id'].toString() == key);
+        final ingredient = _allIngredients
+            .firstWhere((ingredient) => ingredient['id'].toString() == key);
         final storageDays = ingredient['storageDays'];
-        final filteredValue = value..removeWhere((date, count) => _isExpiredAndZeroCount(date, count, storageDays));
+        final filteredValue = value
+          ..removeWhere((date, count) =>
+              _isExpiredAndZeroCount(date, count, storageDays));
 
         if (filteredValue.isNotEmpty) {
           jsonData[key] = filteredValue;
@@ -229,7 +232,8 @@ class _MenuScreenState extends State<MenuScreen> {
   }
 
   bool _isExpiredAndZeroCount(String date, double count, int storageDays) {
-    final expirationDate = DateTime.parse(date).add(Duration(days: storageDays));
+    final expirationDate =
+        DateTime.parse(date).add(Duration(days: storageDays));
     return count == 0.0 && expirationDate.isBefore(DateTime.now());
   }
 
@@ -280,7 +284,7 @@ class _MenuScreenState extends State<MenuScreen> {
       context: context,
       type: QuickAlertType.warning,
       title: 'คำเตือน!',
-      text: message, 
+      text: message,
       confirmBtnColor: Colors.grey[500]!,
       confirmBtnText: 'ตกลง',
     );
@@ -298,7 +302,8 @@ class _MenuScreenState extends State<MenuScreen> {
           for (var date in dates) {
             final availableQuantity = _ingredientCounts[ingredientId]![date]!;
             if (availableQuantity >= remainingQuantity) {
-              _ingredientCounts[ingredientId]![date] = availableQuantity - remainingQuantity;
+              _ingredientCounts[ingredientId]![date] =
+                  availableQuantity - remainingQuantity;
               break;
             } else {
               _ingredientCounts[ingredientId]![date] = 0;
@@ -317,12 +322,17 @@ class _MenuScreenState extends State<MenuScreen> {
       if (_foundMenu[index]['count'] > 0) {
         _foundMenu[index]['count']--;
 
-        final String currentDate = DateTime.now().toIso8601String().split('T').first;
+        final String currentDate =
+            DateTime.now().toIso8601String().split('T').first;
         final ingredientId = _foundMenu[index]['ingredients'].keys.first;
         final requiredQuantity = _foundMenu[index]['ingredients'][ingredientId];
 
-        if (ingredientId != null && currentDate != null && requiredQuantity != null) {
-          _ingredientCounts[ingredientId]![currentDate] = (_ingredientCounts[ingredientId]![currentDate] ?? 0) + requiredQuantity;
+        if (ingredientId != null &&
+            currentDate != null &&
+            requiredQuantity != null) {
+          _ingredientCounts[ingredientId]![currentDate] =
+              (_ingredientCounts[ingredientId]![currentDate] ?? 0) +
+                  requiredQuantity;
         }
       }
     });
@@ -346,7 +356,8 @@ class _MenuScreenState extends State<MenuScreen> {
     _saveCounts();
   }
 
-  Future<void> _decreaseIngredients(List<Map<String, dynamic>> selectedItems) async {
+  Future<void> _decreaseIngredients(
+      List<Map<String, dynamic>> selectedItems) async {
     for (var item in selectedItems) {
       for (var ingredient in item['ingredients'].entries) {
         final ingredientId = ingredient.key;
@@ -359,7 +370,8 @@ class _MenuScreenState extends State<MenuScreen> {
           for (var date in dates) {
             final availableQuantity = _ingredientCounts[ingredientId]![date]!;
             if (availableQuantity >= remainingQuantity) {
-              _ingredientCounts[ingredientId]![date] = availableQuantity - remainingQuantity;
+              _ingredientCounts[ingredientId]![date] =
+                  availableQuantity - remainingQuantity;
               break;
             } else {
               _ingredientCounts[ingredientId]![date] = 0;
@@ -390,7 +402,8 @@ class _MenuScreenState extends State<MenuScreen> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
                   ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 ),
               ),
             ),
@@ -404,28 +417,35 @@ class _MenuScreenState extends State<MenuScreen> {
                         elevation: 4,
                         margin: const EdgeInsets.symmetric(vertical: 10),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 13),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 13, horizontal: 13),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
-                                  Image.asset(
-                                    _foundMenu[index]["picture"],
-                                    width: 80,
-                                    height: 80,
-                                    fit: BoxFit.cover,
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset(
+                                      _foundMenu[index]["picture"],
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    ),
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.only(left: 16.0),
+                                          padding:
+                                              const EdgeInsets.only(left: 16.0),
                                           child: Text(
                                             _foundMenu[index]['name'],
-                                            style: const TextStyle(fontSize: 18),
+                                            style:
+                                                const TextStyle(fontSize: 18),
                                           ),
                                         ),
                                         const SizedBox(height: 8),
@@ -433,15 +453,19 @@ class _MenuScreenState extends State<MenuScreen> {
                                           children: [
                                             IconButton(
                                               icon: const Icon(Icons.remove),
-                                              onPressed: () => _decrementCount(index),
+                                              onPressed: () =>
+                                                  _decrementCount(index),
                                             ),
                                             Text(
-                                              _foundMenu[index]["count"].toString(),
-                                              style: const TextStyle(fontSize: 16),
+                                              _foundMenu[index]["count"]
+                                                  .toString(),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
                                             ),
                                             IconButton(
                                               icon: const Icon(Icons.add),
-                                              onPressed: () => _incrementCount(index),
+                                              onPressed: () =>
+                                                  _incrementCount(index),
                                             ),
                                           ],
                                         ),
@@ -509,7 +533,10 @@ class CustomFabLocation extends FloatingActionButtonLocation {
   @override
   Offset getOffset(ScaffoldPrelayoutGeometry scaffoldGeometry) {
     final double fabX = scaffoldGeometry.scaffoldSize.width - 16.0 - 56.0;
-    final double fabY = scaffoldGeometry.scaffoldSize.height - scaffoldGeometry.minInsets.bottom - 56.0 - 16.0;
+    final double fabY = scaffoldGeometry.scaffoldSize.height -
+        scaffoldGeometry.minInsets.bottom -
+        56.0 -
+        16.0;
     return Offset(fabX, fabY);
   }
 }

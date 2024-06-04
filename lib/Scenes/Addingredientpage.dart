@@ -12,18 +12,102 @@ class AddIngredientsPage extends StatefulWidget {
 
 class _AddIngredientsPageState extends State<AddIngredientsPage> {
   final List<Map<String, dynamic>> _allIngredients = [
-    {"id": 1, "name": "เนื้อ", "type": "meat", "count": 0.0, "picture": "assets/images/beef.jpg" ,"storageDays": 5},
-    {"id": 2, "name": "ไก่", "type": "meat", "count": 0.0, "picture": "assets/images/chicken.jpg", "storageDays": 3},
-    {"id": 3, "name": "ปลา", "type": "meat", "count": 0.0, "picture": "assets/images/fish.jpg", "storageDays": 3},
-    {"id": 4, "name": "หมู", "type": "meat", "count": 0.0, "picture": "assets/images/pork.jpg", "storageDays": 5},
-    {"id": 5, "name": "กุ้ง", "type": "meat", "count": 0.0, "picture": "assets/images/shrimp.jpg", "storageDays": 3},
-    {"id": 6, "name": "ปู", "type": "meat", "count": 0.0, "picture": "assets/images/crab.jpg", "storageDays": 3},
-    {"id": 7, "name": "กะหล่ำ", "type": "vegetable", "count": 0.0, "picture": "assets/images/cabbage.jpg", "storageDays": 7},
-    {"id": 8, "name": "เเครอท", "type": "vegetable", "count": 0.0, "picture": "assets/images/carrot.jpg", "storageDays": 21},
-    {"id": 9, "name": "มะเขือเทศ", "type": "vegetable", "count": 0.0, "picture": "assets/images/tomato.jpg", "storageDays": 14},
-    {"id": 10, "name": "มะนาว", "type": "vegetable", "count": 0.0, "picture": "assets/images/lime.jpg", "storageDays": 28},
-    {"id": 11, "name": "หัวหอม", "type": "vegetable", "count": 0.0, "picture": "assets/images/onion.jpg", "storageDays": 21},
-    {"id": 12, "name": "เห็ด", "type": "vegetable", "count": 0.0, "picture": "assets/images/mushroom.jpg", "storageDays": 7},
+    {
+      "id": 1,
+      "name": "เนื้อ",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/beef.jpg",
+      "storageDays": 5
+    },
+    {
+      "id": 2,
+      "name": "ไก่",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/chicken.jpg",
+      "storageDays": 5
+    },
+    {
+      "id": 3,
+      "name": "ปลา",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/fish.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 4,
+      "name": "หมู",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/pork.jpg",
+      "storageDays": 5
+    },
+    {
+      "id": 5,
+      "name": "กุ้ง",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/shrimp.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 6,
+      "name": "ปู",
+      "type": "meat",
+      "count": 0.0,
+      "picture": "assets/images/crab.jpg",
+      "storageDays": 3
+    },
+    {
+      "id": 7,
+      "name": "กะหล่ำ",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/cabbage.jpg",
+      "storageDays": 7
+    },
+    {
+      "id": 8,
+      "name": "เเครอท",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/carrot.jpg",
+      "storageDays": 7
+    },
+    {
+      "id": 9,
+      "name": "มะเขือเทศ",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/tomato.jpg",
+      "storageDays": 7
+    },
+    {
+      "id": 10,
+      "name": "มะนาว",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/lime.jpg",
+      "storageDays": 10
+    },
+    {
+      "id": 11,
+      "name": "หัวหอม",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/onion.jpg",
+      "storageDays": 10
+    },
+    {
+      "id": 12,
+      "name": "เห็ด",
+      "type": "vegetable",
+      "count": 0.0,
+      "picture": "assets/images/mushroom.jpg",
+      "storageDays": 7
+    },
   ];
 
   List<Map<String, dynamic>> _foundIngredients = [];
@@ -36,7 +120,8 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
   @override
   void initState() {
     super.initState();
-    _foundIngredients = _allIngredients.map((ingredient) => {...ingredient}).toList();
+    _foundIngredients =
+        _allIngredients.map((ingredient) => {...ingredient}).toList();
     _initializeFile();
   }
 
@@ -58,14 +143,16 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
     final Map<String, dynamic> jsonData = json.decode(contents);
 
     setState(() {
-      _ingredientCounts = jsonData.map((key, value) => MapEntry(key, (value as Map).map((k, v) => MapEntry(k, (v as num).toDouble()))));
+      _ingredientCounts = jsonData.map((key, value) => MapEntry(key,
+          (value as Map).map((k, v) => MapEntry(k, (v as num).toDouble()))));
     });
 
     _printFileContents(); // Print file contents after loading
   }
 
   Future<void> _saveCounts() async {
-    final jsonData = _ingredientCounts.map((key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
+    final jsonData = _ingredientCounts.map(
+        (key, value) => MapEntry(key, value.map((k, v) => MapEntry(k, v))));
     await _countFile.writeAsString(json.encode(jsonData));
     setState(() {
       _showFab = false;
@@ -87,11 +174,18 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
     _searchTerm = enteredKeyword;
     List<Map<String, dynamic>> results = [];
     if (enteredKeyword.isEmpty) {
-      results = _allIngredients.where((ingredient) => _selectedType == 'all' || ingredient['type'] == _selectedType).toList();
+      results = _allIngredients
+          .where((ingredient) =>
+              _selectedType == 'all' || ingredient['type'] == _selectedType)
+          .toList();
     } else {
-      results = _allIngredients.where((ingredient) =>
-        ingredient["name"].toLowerCase().contains(enteredKeyword.toLowerCase()) &&
-        (_selectedType == 'all' || ingredient['type'] == _selectedType)).toList();
+      results = _allIngredients
+          .where((ingredient) =>
+              ingredient["name"]
+                  .toLowerCase()
+                  .contains(enteredKeyword.toLowerCase()) &&
+              (_selectedType == 'all' || ingredient['type'] == _selectedType))
+          .toList();
     }
 
     setState(() {
@@ -110,7 +204,8 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
     setState(() {
       _foundIngredients[index]['count'] += 1.0;
       _showFab = true;
-      print('Incremented count of ${_foundIngredients[index]['name']} to ${_foundIngredients[index]['count']}');
+      print(
+          'Incremented count of ${_foundIngredients[index]['name']} to ${_foundIngredients[index]['count']}');
     });
   }
 
@@ -119,7 +214,8 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
       if (_foundIngredients[index]['count'] > 0) {
         _foundIngredients[index]['count'] -= 1.0;
         _showFab = true;
-        print('Decremented count of ${_foundIngredients[index]['name']} to ${_foundIngredients[index]['count']}');
+        print(
+            'Decremented count of ${_foundIngredients[index]['name']} to ${_foundIngredients[index]['count']}');
       }
     });
   }
@@ -129,24 +225,32 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
       double newCount = double.tryParse(value) ?? 0.0;
       _foundIngredients[index]['count'] = newCount;
       _showFab = true;
-      print('Updated count of ${_foundIngredients[index]['name']} to $newCount');
+      print(
+          'Updated count of ${_foundIngredients[index]['name']} to $newCount');
     });
   }
 
   void _confirmSelection() {
     setState(() {
-      final String currentDate = DateTime.now().toIso8601String().split('T').first; // Get the current date
+      final String currentDate = DateTime.now()
+          .toIso8601String()
+          .split('T')
+          .first; // Get the current date
       for (var ingredient in _foundIngredients) {
         final id = ingredient['id'].toString();
         if (!_ingredientCounts.containsKey(id)) {
           _ingredientCounts[id] = {};
         }
         if (_ingredientCounts[id]!.containsKey(currentDate)) {
-          _ingredientCounts[id]![currentDate] = (_ingredientCounts[id]![currentDate]! + (ingredient['count'] as double)).toDouble();
+          _ingredientCounts[id]![currentDate] =
+              (_ingredientCounts[id]![currentDate]! +
+                      (ingredient['count'] as double))
+                  .toDouble();
         } else {
           _ingredientCounts[id]![currentDate] = ingredient['count'] as double;
         }
-        print('Confirmed count of ${ingredient['name']} for date $currentDate: ${_ingredientCounts[id]![currentDate]}');
+        print(
+            'Confirmed count of ${ingredient['name']} for date $currentDate: ${_ingredientCounts[id]![currentDate]}');
         ingredient['count'] = 0.0; // Reset the count after confirming
       }
     });
@@ -158,7 +262,8 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
     return Scaffold(
       appBar: AppBar(
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color(0xFFC7E8D5), // Set the background color of the AppBar
+        backgroundColor:
+            const Color(0xFFC7E8D5), // Set the background color of the AppBar
         elevation: 0,
         title: const Text('เพิ่มวัตถุดิบ'),
       ),
@@ -176,7 +281,8 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(8.0)),
                   ),
-                  contentPadding: EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                 ),
               ),
             ),
@@ -261,11 +367,16 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                                     children: [
                                       Row(
                                         children: [
-                                          Image.asset(
-                                            _foundIngredients[index]["picture"],
-                                            width: 80,
-                                            height: 80,
-                                            fit: BoxFit.cover,
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: Image.asset(
+                                              _foundIngredients[index]
+                                                  ["picture"],
+                                              width: 80,
+                                              height: 80,
+                                              fit: BoxFit.cover,
+                                            ),
                                           ),
                                           const SizedBox(width: 16),
                                           Expanded(
@@ -299,9 +410,9 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                                                       height:
                                                           30, // Set the height of the TextField
                                                       child: TextField(
-                                                        keyboardType:
-                                                            TextInputType
-                                                                .numberWithOptions(decimal: true),
+                                                        keyboardType: TextInputType
+                                                            .numberWithOptions(
+                                                                decimal: true),
                                                         controller:
                                                             TextEditingController(
                                                                 text: _foundIngredients[
@@ -376,8 +487,8 @@ class _AddIngredientsPageState extends State<AddIngredientsPage> {
                     title: 'สำเร็จ',
                     text: 'เพิ่มวัตถุดิบลงในระบบเรียบร้อย',
                     headerBackgroundColor: Color(0xFF306754),
-                    confirmBtnColor:  Colors.grey[500]!,
-                    barrierColor:  Color.fromARGB(102, 62, 66, 64),
+                    confirmBtnColor: Colors.grey[500]!,
+                    barrierColor: Color.fromARGB(102, 62, 66, 64),
                     confirmBtnText: 'ตกลง',
                   );
                 },

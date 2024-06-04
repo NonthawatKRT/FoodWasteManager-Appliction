@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:flutter/material.dart';
 
 class InventoryPage extends StatefulWidget {
   @override
@@ -41,7 +41,7 @@ class _InventoryPageState extends State<InventoryPage> {
       "type": "meat",
       "count": 0.0,
       "picture": "assets/images/chicken.jpg",
-      "storageDays": 3
+      "storageDays": 5
     },
     {
       "id": 3,
@@ -89,7 +89,7 @@ class _InventoryPageState extends State<InventoryPage> {
       "type": "vegetable",
       "count": 0.0,
       "picture": "assets/images/carrot.jpg",
-      "storageDays": 21
+      "storageDays": 7
     },
     {
       "id": 9,
@@ -97,7 +97,7 @@ class _InventoryPageState extends State<InventoryPage> {
       "type": "vegetable",
       "count": 0.0,
       "picture": "assets/images/tomato.jpg",
-      "storageDays": 14
+      "storageDays": 7
     },
     {
       "id": 10,
@@ -105,7 +105,7 @@ class _InventoryPageState extends State<InventoryPage> {
       "type": "vegetable",
       "count": 0.0,
       "picture": "assets/images/lime.jpg",
-      "storageDays": 28
+      "storageDays": 10
     },
     {
       "id": 11,
@@ -113,7 +113,7 @@ class _InventoryPageState extends State<InventoryPage> {
       "type": "vegetable",
       "count": 0.0,
       "picture": "assets/images/onion.jpg",
-      "storageDays": 21
+      "storageDays": 10
     },
     {
       "id": 12,
@@ -153,59 +153,64 @@ class _InventoryPageState extends State<InventoryPage> {
     }
   }
 
- Future<void> _loadCounts() async {
-  final contents = await _countFile.readAsString();
-  final Map<String, dynamic> jsonData = json.decode(contents);
+  Future<void> _loadCounts() async {
+    final contents = await _countFile.readAsString();
+    final Map<String, dynamic> jsonData = json.decode(contents);
 
-  setState(() {
-    _ingredientCounts = {};
+    setState(() {
+      _ingredientCounts = {};
 
-    jsonData.forEach((key, value) {
-      final ingredient = _allIngredients.firstWhere((ingredient) => ingredient['id'].toString() == key);
-      final storageDays = ingredient['storageDays'];
+      jsonData.forEach((key, value) {
+        final ingredient = _allIngredients
+            .firstWhere((ingredient) => ingredient['id'].toString() == key);
+        final storageDays = ingredient['storageDays'];
 
-      value.forEach((date, count) {
-        if (!_isExpiredAndZeroCount(date, count, storageDays)) {
-          _ingredientCounts.putIfAbsent(key, () => {});
-          _ingredientCounts[key]![date] = count.toDouble();
+        value.forEach((date, count) {
+          if (!_isExpiredAndZeroCount(date, count, storageDays)) {
+            _ingredientCounts.putIfAbsent(key, () => {});
+            _ingredientCounts[key]![date] = count.toDouble();
+          }
+        });
+
+        if (_ingredientCounts.containsKey(key)) {
+          _controllers[key] = {};
+          _ingredientCounts[key]!.forEach((date, count) {
+            _controllers[key]![date] =
+                TextEditingController(text: count.toString());
+          });
         }
       });
 
-      if (_ingredientCounts.containsKey(key)) {
-        _controllers[key] = {};
-        _ingredientCounts[key]!.forEach((date, count) {
-          _controllers[key]![date] = TextEditingController(text: count.toString());
-        });
+      _updateTotalCounts();
+    });
+  }
+
+  bool _isExpiredAndZeroCount(String date, double count, int storageDays) {
+    final expirationDate =
+        DateTime.parse(date).add(Duration(days: storageDays));
+    return count == 0.0 && expirationDate.isBefore(DateTime.now());
+  }
+
+  Future<void> _saveCounts() async {
+    final Map<String, dynamic> jsonData = {};
+
+    _ingredientCounts.forEach((key, value) {
+      final ingredient = _allIngredients
+          .firstWhere((ingredient) => ingredient['id'].toString() == key);
+      final storageDays = ingredient['storageDays'];
+      final filteredValue = value
+        ..removeWhere(
+            (date, count) => _isExpiredAndZeroCount(date, count, storageDays));
+
+      if (filteredValue.isNotEmpty) {
+        jsonData[key] = filteredValue;
       }
     });
 
+    await _countFile.writeAsString(json.encode(jsonData));
     _updateTotalCounts();
-  });
-}
-
-bool _isExpiredAndZeroCount(String date, double count, int storageDays) {
-  final expirationDate = DateTime.parse(date).add(Duration(days: storageDays));
-  return count == 0.0 && expirationDate.isBefore(DateTime.now());
-}
-
-  Future<void> _saveCounts() async {
-  final Map<String, dynamic> jsonData = {};
-
-  _ingredientCounts.forEach((key, value) {
-    final ingredient = _allIngredients.firstWhere((ingredient) => ingredient['id'].toString() == key);
-    final storageDays = ingredient['storageDays'];
-    final filteredValue = value..removeWhere((date, count) => _isExpiredAndZeroCount(date, count, storageDays));
-
-    if (filteredValue.isNotEmpty) {
-      jsonData[key] = filteredValue;
-    }
-  });
-
-  await _countFile.writeAsString(json.encode(jsonData));
-  _updateTotalCounts();
-  _printFileContents(); // Print file contents after saving
-}
-
+    _printFileContents(); // Print file contents after saving
+  }
 
   Future<void> _printFileContents() async {
     if (await _countFile.exists()) {
@@ -313,7 +318,8 @@ bool _isExpiredAndZeroCount(String date, double count, int storageDays) {
   //   return difference.inDays;
   // }
 
-  final int greenThreshold = 2; // Days remaining before expiration to consider as green
+  final int greenThreshold =
+      2; // Days remaining before expiration to consider as green
 
   Color _getColorForExpiration(DateTime expirationDate) {
     final today = DateTime.now();
@@ -400,11 +406,14 @@ bool _isExpiredAndZeroCount(String date, double count, int storageDays) {
                               children: [
                                 Row(
                                   children: [
-                                    Image.asset(
-                                      _foundIngredients[index]["picture"],
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.asset(
+                                        _foundIngredients[index]["picture"],
+                                        width: 80,
+                                        height: 80,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
                                     const SizedBox(width: 16),
                                     Expanded(
@@ -472,7 +481,12 @@ bool _isExpiredAndZeroCount(String date, double count, int storageDays) {
                                             .map(
                                               (entry) => Row(
                                                 children: [
-                                                  Text(entry.key + ' : ',
+                                                  Text(
+                                                      DateFormat('dd/MM/yy')
+                                                              .format(DateTime
+                                                                  .parse(entry
+                                                                      .key)) +
+                                                          '  : ',
                                                       style: TextStyle(
                                                         fontSize: 15,
                                                         color: _getColorForExpiration(
