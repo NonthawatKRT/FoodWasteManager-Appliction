@@ -147,68 +147,67 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _loadCounts() async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final countFilePath = '${directory.path}/ingredient_counts.json';
-      final countFile = File(countFilePath);
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    final countFilePath = '${directory.path}/ingredient_counts.json';
+    final countFile = File(countFilePath);
 
-      final contents = await countFile.readAsString();
-      print('File contents: $contents'); // Print the contents for debugging
-      final Map<String, dynamic> jsonData =
-          json.decode(contents) as Map<String, dynamic>;
+    final contents = await countFile.readAsString();
+    print('File contents: $contents'); // Print the contents for debugging
+    final Map<String, dynamic> jsonData = json.decode(contents) as Map<String, dynamic>;
 
-      final now = DateTime.now();
+    final now = DateTime.now();
 
-      setState(() {
-        _expiringSoon = [];
-        _lowStock = [];
-        _ingredientCounts = {};
+    setState(() {
+      _expiringSoon = [];
+      _lowStock = [];
+      _ingredientCounts = {};
 
-        for (var item in jsonData.entries) {
-          final id = int.parse(item.key); // Convert the key to int
-          final counts = item.value as Map<String, dynamic>;
+      for (var item in jsonData.entries) {
+        final id = int.parse(item.key); // Convert the key to int
+        final counts = item.value as Map<String, dynamic>;
 
-          _ingredientCounts[id] = counts
-              .map((key, value) => MapEntry(key, (value as num).toDouble()));
+        _ingredientCounts[id] = counts
+            .map((key, value) => MapEntry(key, (value as num).toDouble()));
 
-          final ingredient =
-              _allIngredients.firstWhere((ing) => ing['id'] == id);
+        final ingredient =
+            _allIngredients.firstWhere((ing) => ing['id'] == id);
 
-          double totalCount = 0.0;
+        double totalCount = 0.0;
 
-          for (var entry in counts.entries) {
-            final addedDate = DateTime.parse(entry.key);
-            final count = (entry.value as num)
-                .toDouble(); // Ensure value is converted to double
-            totalCount += count;
+        for (var entry in counts.entries) {
+          final addedDate = DateTime.parse(entry.key);
+          final count = (entry.value as num).toDouble(); // Ensure value is converted to double
+          totalCount += count;
 
-            final expirationDate =
-                addedDate.add(Duration(days: ingredient['storageDays']));
-            final remainingDays = expirationDate.difference(now).inDays;
+          final expirationDate =
+              addedDate.add(Duration(days: ingredient['storageDays']));
+          final remainingDays = expirationDate.difference(now).inDays;
 
-            if (remainingDays <= 0) {
-              _expiringSoon.add({
-                'name': ingredient['name'],
-                'expirationDate': expirationDate,
-                'count': count,
-                'picture': ingredient['picture'],
-              });
-            }
-          }
-
-          if (totalCount <= 2.0) {
-            _lowStock.add({
+          if (remainingDays <= 0 && count > 0.0) { // Check if count > 0.0
+            _expiringSoon.add({
               'name': ingredient['name'],
-              'count': totalCount,
+              'expirationDate': expirationDate,
+              'count': count,
               'picture': ingredient['picture'],
             });
           }
         }
-      });
-    } catch (e) {
-      print('Error loading counts: $e');
-    }
+
+        if (totalCount <= 2.0) {
+          _lowStock.add({
+            'name': ingredient['name'],
+            'count': totalCount,
+            'picture': ingredient['picture'],
+          });
+        }
+      }
+    });
+  } catch (e) {
+    print('Error loading counts: $e');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

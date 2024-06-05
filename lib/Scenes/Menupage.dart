@@ -328,7 +328,6 @@ class _MenuScreenState extends State<MenuScreen> {
         final requiredQuantity = _foundMenu[index]['ingredients'][ingredientId];
 
         if (ingredientId != null &&
-            currentDate != null &&
             requiredQuantity != null) {
           _ingredientCounts[ingredientId]![currentDate] =
               (_ingredientCounts[ingredientId]![currentDate] ?? 0) +
